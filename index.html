@@ -18,6 +18,7 @@
     --yellow:#F2B705;
     --yellow-dark:#C99200;
     --red:#C1432A;
+    --green:#2E7D4F;
     --line:#CFCBC1;
     --radius:3px;
   }
@@ -32,6 +33,7 @@
   }
   .mono{font-family:'JetBrains Mono',monospace;}
   a{color:inherit;}
+  button{font-family:'Archivo',sans-serif;}
 
   /* ---------- Top bar ---------- */
   .topbar{
@@ -41,7 +43,8 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:16px;
+    gap:12px;
+    flex-wrap:wrap;
     position:sticky;
     top:0;
     z-index:30;
@@ -62,12 +65,37 @@
     font-size:0.72rem;
     color:var(--steel-light);
   }
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
   .stock-count{
     font-family:'JetBrains Mono',monospace;
     font-size:0.78rem;
     color:var(--yellow);
     white-space:nowrap;
+    margin-right:4px;
   }
+  .topbar-btn{
+    background:transparent;
+    color:var(--concrete);
+    border:1.5px solid var(--steel);
+    padding:7px 12px;
+    border-radius:var(--radius);
+    font-weight:700;
+    font-size:0.78rem;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .topbar-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+  .topbar-btn.accent{
+    background:var(--yellow);
+    color:var(--ink);
+    border-color:var(--yellow);
+  }
+  .topbar-btn.accent:hover{background:var(--yellow-dark);border-color:var(--yellow-dark);color:var(--ink);}
 
   /* ---------- Layout ---------- */
   .layout{
@@ -139,10 +167,10 @@
   }
   .result-row{
     display:grid;
-    grid-template-columns: 56px 1fr 108px 122px;
-    grid-template-areas: "sr name price qty";
+    grid-template-columns: 56px 1fr 30px 96px 122px;
+    grid-template-areas: "sr name edit price qty";
     align-items:center;
-    gap:12px;
+    gap:10px;
     padding:12px 14px;
     border-bottom:1px solid var(--line);
     transition:background .12s ease;
@@ -159,12 +187,40 @@
   }
   .r-name{
     grid-area:name;
-    font-weight:600;
-    font-size:0.94rem;
-    line-height:1.3;
     min-width:0;
     overflow-wrap:break-word;
   }
+  .r-name-text{
+    font-weight:600;
+    font-size:0.94rem;
+    line-height:1.3;
+  }
+  .r-name-meta{
+    font-size:0.7rem;
+    color:var(--steel-light);
+    margin-top:2px;
+  }
+  .r-name-meta .unit-tag{
+    display:inline-block;
+    background:var(--concrete-dark);
+    color:var(--steel);
+    padding:1px 6px;
+    border-radius:2px;
+    font-weight:600;
+    font-size:0.66rem;
+    letter-spacing:0.02em;
+  }
+  .r-edit{
+    grid-area:edit;
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:var(--steel-light);
+    font-size:0.95rem;
+    padding:4px;
+    line-height:1;
+  }
+  .r-edit:hover{color:var(--ink);}
   .r-price{
     grid-area:price;
     font-size:0.94rem;
@@ -184,41 +240,6 @@
     align-items:center;
     justify-content:flex-end;
     gap:4px;
-  }
-
-  /* Stack rows on narrow screens so long names and the qty stepper
-     always get their own full-width lines instead of squeezing. */
-  @media (max-width: 640px){
-    .result-row{
-      grid-template-columns: 1fr auto;
-      grid-template-areas:
-        "name name"
-        "sr price"
-        "qty qty";
-      row-gap:8px;
-      column-gap:10px;
-      padding:14px;
-    }
-    .r-sr{ align-self:center; }
-    .r-price{ align-self:center; }
-    .stepper{
-      justify-content:stretch;
-      width:100%;
-    }
-    .stepper button{
-      width:38px;
-      height:38px;
-      font-size:1.15rem;
-      flex:0 0 auto;
-    }
-    .stepper input{
-      flex:1 1 auto;
-      width:auto;
-      max-width:90px;
-      height:38px;
-      font-size:1rem;
-    }
-    .col-headers{ display:none; }
   }
   .stepper button{
     width:26px;
@@ -281,8 +302,8 @@
   /* ---------- Column headers ---------- */
   .col-headers{
     display:grid;
-    grid-template-columns: 56px 1fr 108px 122px;
-    gap:12px;
+    grid-template-columns: 56px 1fr 30px 96px 122px;
+    gap:10px;
     padding:0 14px 8px 14px;
     font-size:0.7rem;
     color:var(--steel);
@@ -291,6 +312,40 @@
   }
   .col-headers .ch-price{text-align:right;}
   .col-headers .ch-qty{text-align:right;}
+
+  /* Mobile: stack rows so long names + steppers get room */
+  @media (max-width: 640px){
+    .result-row{
+      grid-template-columns: 1fr auto auto;
+      grid-template-areas:
+        "name name edit"
+        "sr sr price"
+        "qty qty qty";
+      row-gap:8px;
+      column-gap:10px;
+      padding:14px;
+    }
+    .r-sr{ align-self:center; }
+    .r-price{ align-self:center; }
+    .stepper{
+      justify-content:stretch;
+      width:100%;
+    }
+    .stepper button{
+      width:38px;
+      height:38px;
+      font-size:1.15rem;
+      flex:0 0 auto;
+    }
+    .stepper input{
+      flex:1 1 auto;
+      width:auto;
+      max-width:90px;
+      height:38px;
+      font-size:1rem;
+    }
+    .col-headers{ display:none; }
+  }
 
   /* ---------- Order ticket (right rail / desktop) ---------- */
   .ticket-col{
@@ -327,8 +382,8 @@
     color:var(--yellow);
   }
   .ticket-lines{
-    max-height:calc(100vh - 330px);
-    min-height:80px;
+    max-height:calc(100vh - 420px);
+    min-height:70px;
     overflow-y:auto;
     border-bottom:1px dashed var(--line);
   }
@@ -376,9 +431,11 @@
   .sum-row{
     display:flex;
     justify-content:space-between;
+    align-items:center;
     font-size:0.8rem;
     color:var(--steel);
-    margin-bottom:4px;
+    margin-bottom:6px;
+    gap:8px;
   }
   .sum-row.total{
     font-size:1.05rem;
@@ -389,6 +446,30 @@
     border-top:2px solid var(--ink);
   }
   .sum-row.total .mono{font-family:'JetBrains Mono',monospace;}
+  .discount-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .discount-row input[type="number"]{
+    width:56px;
+    height:26px;
+    text-align:right;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.8rem;
+    padding:0 4px;
+  }
+  .discount-row select{
+    height:26px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    font-family:'Archivo',sans-serif;
+    font-size:0.75rem;
+    background:var(--paper);
+    color:var(--ink);
+  }
   .ticket-note{
     font-size:0.72rem;
     color:var(--steel-light);
@@ -398,10 +479,9 @@
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:8px;
-    padding:0 16px 16px 16px;
+    padding:0 16px 10px 16px;
   }
   .ticket-actions button{
-    font-family:'Archivo',sans-serif;
     font-weight:700;
     font-size:0.8rem;
     padding:10px 8px;
@@ -416,6 +496,12 @@
     border-color:var(--ink);
   }
   .ticket-actions button.primary:hover{background:var(--yellow-dark);}
+  .ticket-actions button.complete{
+    background:var(--green);
+    border-color:var(--green);
+    color:#fff;
+  }
+  .ticket-actions button.complete:hover{background:#245f3e;}
   .ticket-actions button:hover{background:var(--concrete-dark);}
   .ticket-actions button.full{grid-column:1/-1;}
   .clear-row{
@@ -492,6 +578,140 @@
     width:36px;height:4px;background:var(--line);border-radius:2px;display:block;
   }
 
+  /* ---------- Generic modal ---------- */
+  .modal-overlay{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(28,31,34,0.55);
+    z-index:200;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    background:var(--paper);
+    border-radius:6px;
+    max-width:440px;
+    width:100%;
+    max-height:88vh;
+    overflow-y:auto;
+    box-shadow:0 12px 30px rgba(0,0,0,.3);
+  }
+  .modal-box.wide{max-width:640px;}
+  .modal-head{
+    background:var(--ink);
+    color:var(--paper);
+    padding:14px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .modal-head h3{margin:0;font-size:0.95rem;font-weight:700;}
+  .modal-close{
+    background:none;border:none;color:var(--concrete);
+    font-size:1.2rem;cursor:pointer;line-height:1;padding:2px 6px;
+  }
+  .modal-close:hover{color:var(--yellow);}
+  .modal-body{padding:18px;}
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font-size:0.76rem;
+    font-weight:700;
+    color:var(--steel);
+    margin-bottom:5px;
+    letter-spacing:0.02em;
+  }
+  .field input[type="text"], .field input[type="number"], .field select{
+    width:100%;
+    padding:10px 12px;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    font-family:'Archivo',sans-serif;
+    font-size:0.9rem;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--yellow-dark);}
+  .field-hint{font-size:0.7rem;color:var(--steel-light);margin-top:4px;}
+  .field-row{display:flex;gap:10px;}
+  .field-row .field{flex:1;}
+  .modal-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-top:6px;
+  }
+  .modal-actions .left-actions{display:flex;gap:8px;}
+  .btn{
+    font-weight:700;
+    font-size:0.82rem;
+    padding:9px 16px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    border:2px solid var(--ink);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .btn:hover{background:var(--concrete-dark);}
+  .btn.primary{background:var(--yellow);border-color:var(--ink);}
+  .btn.primary:hover{background:var(--yellow-dark);}
+  .btn.danger{background:var(--paper);border-color:var(--red);color:var(--red);}
+  .btn.danger:hover{background:var(--red);color:#fff;}
+
+  /* ---------- Report modal ---------- */
+  .report-summary-bar{
+    display:flex;
+    gap:16px;
+    padding:12px 18px;
+    background:var(--concrete);
+    border-bottom:1px solid var(--line);
+    font-size:0.78rem;
+    color:var(--steel);
+    flex-wrap:wrap;
+  }
+  .report-summary-bar b{color:var(--ink);font-family:'JetBrains Mono',monospace;}
+  .report-list{padding:10px 18px 18px 18px;}
+  .report-entry{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-bottom:10px;
+    overflow:hidden;
+  }
+  .report-entry-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 14px;
+    cursor:pointer;
+    background:var(--paper);
+    gap:10px;
+  }
+  .report-entry-head:hover{background:var(--concrete);}
+  .re-date{font-size:0.82rem;font-weight:700;}
+  .re-meta{font-size:0.72rem;color:var(--steel);margin-top:2px;}
+  .re-total{font-family:'JetBrains Mono',monospace;font-weight:800;white-space:nowrap;}
+  .report-entry-body{
+    display:none;
+    padding:10px 14px 14px 14px;
+    border-top:1px solid var(--line);
+    background:var(--concrete);
+  }
+  .report-entry.expanded .report-entry-body{display:block;}
+  .re-line{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.78rem;
+    padding:4px 0;
+    border-bottom:1px dotted var(--line);
+  }
+  .re-line:last-child{border-bottom:none;}
+  .re-line-name{flex:1;min-width:0;padding-right:8px;}
+  .re-line-meta{font-family:'JetBrains Mono',monospace;color:var(--steel);white-space:nowrap;}
+  .report-empty{padding:40px 20px;text-align:center;color:var(--steel);font-size:0.88rem;}
+
   ::-webkit-scrollbar{width:9px;height:9px;}
   ::-webkit-scrollbar-track{background:var(--concrete);}
   ::-webkit-scrollbar-thumb{background:var(--steel-light);border-radius:5px;}
@@ -504,7 +724,11 @@
     <span class="brand-name">MBM (PVT) LTD</span>
     <span class="brand-sub">PRICE DESK</span>
   </div>
-  <div class="stock-count mono" id="stockCount">2,402 items</div>
+  <div class="topbar-right">
+    <span class="stock-count mono" id="stockCount">2,402 items</span>
+    <button class="topbar-btn" id="reportBtn">Report</button>
+    <button class="topbar-btn accent" id="addProductBtn">+ Add Product</button>
+  </div>
 </div>
 
 <div class="layout">
@@ -536,35 +760,156 @@
   <div id="ticketMobile" style="overflow-y:auto;"></div>
 </div>
 
+<!-- Add / Edit product modal -->
+<div class="modal-overlay" id="productModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="productModalTitle">Add Product</h3>
+      <button class="modal-close" id="productModalClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label for="pmName">Product Name</label>
+        <input type="text" id="pmName" placeholder="e.g. GALVANIZED PIPE CLAMP 1/2&quot;">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="pmPrice">Sale Rate (Rs)</label>
+          <input type="number" id="pmPrice" min="0" step="0.01" placeholder="0.00">
+        </div>
+        <div class="field">
+          <label for="pmBuyRate">Buy Rate (Rs)</label>
+          <input type="number" id="pmBuyRate" min="0" step="0.01" placeholder="Optional">
+        </div>
+      </div>
+      <div class="field">
+        <label for="pmUnit">Measurement Unit</label>
+        <select id="pmUnit">
+          <option value="Pcs">Pcs</option>
+          <option value="Dz">Dz (Dozen)</option>
+          <option value="Box">Box</option>
+          <option value="Roll">Roll</option>
+          <option value="Set">Set</option>
+          <option value="Pair">Pair</option>
+          <option value="Pkt">Pkt</option>
+          <option value="Bag">Bag</option>
+          <option value="Kg">Kg</option>
+          <option value="Ltr">Ltr</option>
+          <option value="Mtr">Mtr</option>
+          <option value="__other__">Other...</option>
+        </select>
+        <input type="text" id="pmUnitOther" placeholder="Type unit" style="margin-top:8px;display:none;">
+      </div>
+      <div class="field-hint" id="pmBuyRateHint">Buy rate is for your own reference only — it's never shown on customer invoices.</div>
+      <div class="modal-actions">
+        <div class="left-actions" id="pmLeftActions"></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" id="pmCancelBtn">Cancel</button>
+          <button class="btn primary" id="pmSaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Report modal -->
+<div class="modal-overlay" id="reportModalOverlay">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <h3>Order Report</h3>
+      <button class="modal-close" id="reportModalClose">&times;</button>
+    </div>
+    <div class="report-summary-bar" id="reportSummaryBar"></div>
+    <div class="report-list" id="reportList"></div>
+  </div>
+</div>
+
+<div id="print-ticket-unused"></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
 <script>
 const PRODUCTS = [[1,"3 WAY UNIVERSAL 13A PLUG ADEPTER WITH USB AKKO",1450.0],[2,"4 BURNERS GLASS TOP",27750.0],[3,"9V BATTERY (AKS)",155.0],[4,"ABC BOX 500",795.0],[5,"ABC BOX 700",975.0],[6,"ABC BOX 900",1100.0],[7,"ABC SCREW DRIVER POINT 8\"",385.0],[8,"ABS JET SHOWER BIG ROUND (1870)",395.0],[9,"ACITKA BATHROOM ACCESSORIES - BLACK (1000)",3450.0],[10,"ACITKA BATHROOM ACCESSORIES - CLEAR (1001)",3450.0],[11,"ACITKA BATHROOM ACCESSORIES - WHITE",3450.0],[12,"ADEPTER YASHODA",530.0],[13,"ADEPTER CHINA",510.0],[14,"AKKO STAR LED LIGHT 80W",1450.0],[15,"ALIS KATO",235.0],[16,"ALLEN KEY 09PCS FLAT HEAVY",725.0],[17,"ALLEN KEY 09PCS FLAT LARGE - CRV",925.0],[18,"ALLEN KEY 09PCS FLAT MEDIUM - CRV",790.0],[19,"ALLEN KEY 09PCS POINT HEAVY",650.0],[20,"ALLEN KEY 10PCS",250.0],[21,"ALLEN KEY 8PCS",225.0],[22,"ALPHA LOCK 5123 SWING",1100.0],[23,"Alteration",null],[24,"ALUMINIUM ALLOY FLASHLIGHT AKKO STAR",1980.0],[25,"ALUMINIUM TOWER BOLT 2 1/2\"",145.0],[26,"ALUMINIUM TOWER BOLT 3\"",165.0],[27,"ALUMINIUM TOWER BOLT 4\"",195.0],[28,"ALUMINIUM TOWER BOLT 6\"",275.0],[29,"AMANO ROLL SHEET 1.5 FT",9525.0],[30,"AMANO ROLL SHEET 1FT",6350.0],[31,"AMANO ROLL SHEET 2.5 FT",15875.0],[32,"AMANO ROLL SHEET 2FT",12700.0],[33,"AMANO ROLL SHEET 3FT",19050.0],[34,"AMANO ROLL SHEET 4FT",25400.0],[35,"AMANO SCREW 1 1/2\" - STEEL",11.0],[36,"AMANO SCREW 1 1/2\" - WOOD",11.0],[37,"AMANO SCREW 1\" - STEEL",9.5],[38,"AMANO SCREW 1\" - WOOD",9.5],[39,"AMANO SCREW 2 1/2\" - WOOD",14.5],[40,"AMANO SCREW 2 1/2\" STEEL",14.5],[41,"AMANO SCREW 2 1/2\" WOOD",14.5],[42,"AMANO SCREW 2\" STEEL",12.0],[43,"AMANO SCREW 2\" WOOD",12.0],[44,"AMANO SCREW 3 1/2\" - STEEL",21.0],[45,"AMANO SCREW 3\" - STEEL",18.0],[46,"AMANO SCREW 4\" - STEEL",23.0],[47,"AMANO SCREW 4\" - WOOD",23.0],[48,"AMANO SCREW WOOD 3\"",18.0],[49,"ANCHOR BOLT 8 \u00d7 125",70.0],[50,"ANCHOR BOLT 8 \u00d7 100",68.0],[51,"ANCHOR BOLT 1/2\"",75.0],[52,"ANCHOR BOLT 1/4\"",17.0],[53,"ANCHOR BOLT 10 \u00d7 125MM",85.0],[54,"ANCHOR BOLT 3/8\"",33.0],[55,"ANCHOR BOLT 3/8\" \u00d7 5\"",33.0],[56,"ANCHOR BOLT 5/16\"",28.0],[57,"ANGEL VALVE 2 WAY PVC HEAVY GALLAXY (1993)",225.0],[58,"ANGLE VALVE - PLM",2450.0],[59,"ANGLE VALVE 1/2\" I LOOK IND",310.0],[60,"ANGLE VALVE 1/2\" SQUARE RMR RANGE (1682)",1590.0],[61,"ANGLE VALVE 2 IN 1 GALLAXY (1753)",1475.0],[62,"ANGLE VALVE 2 WAY BRASS",1250.0],[63,"ANGLE VALVE 2 WAY SQUARE HEAVY RMR (1667)",1285.0],[64,"ANGLE VALVE 304 MAT",725.0],[65,"ANGLE VALVE BRASS RMR - GROHE (1414)",1150.0],[66,"ANGLE VALVE CP GALLAXY (2130)",575.0],[67,"ANGLE VALVE CP LIVER INDIA",575.0],[68,"ANGLE VALVE CP NEW HOODA (2130)",645.0],[69,"ANGLE VALVE GALLAXY MARC (2129)",575.0],[70,"ANGLE VALVE GALLAXY RANGE (1165)",1290.0],[71,"ANGLE VALVE PVC 2WAY HEAVY GALLAXY",195.0],[72,"ANGLE VALVE PVC HEAVY",210.0],[73,"ANGLE VALVE PVC HEAVY GALLAXY (1939)",210.0],[74,"ANGLE VALVE SQUARE - DLF",1550.0],[75,"ANGLE VALVE SQUARE BLACK - HOODA (1140)",925.0],[76,"ANGLE VALVE SQUARE BRASS LIVER RMR (1572)",1250.0],[77,"ARALDITE LARGE",310.0],[78,"ARALDITE SMALL",190.0],[79,"ARM 40 CM SS",null],[80,"ART BRUSH 6PCS BEST WOOD - 05",275.0],[81,"ART BRUSH YUFAN TRANSPARENT- 08",510.0],[82,"AS 12*12 SUS 304 HEAD SHOWER WITH ARM (206)",5750.0],[83,"AS 18*18 SUS 304 HEAD SHOWER WITH ARM (214)",7975.0],[84,"AS NEW RAISING BAR SET - ROUND",43500.0],[85,"AS RAISING BAR SET NEW ROUND",43500.0],[86,"AS WALL HUNG COMMED & CONCEALED CISTERN (C205)",69000.0],[87,"AS WALL HUNG COMMED & CONCEALED CISTERN GOLD & BLACK",null],[88,"AS WALL HUNG COMMED & CONCEALED CISTERN GOLD LINE",null],[89,"AUTO DARK WELDING GOOGLES",1290.0],[90,"AUTOMATIC CUP WASHER PVC (2343)",1975.0],[91,"AVIATION SNIP - LEFT",1100.0],[92,"AVIATION SNIP - RIGHT",1100.0],[93,"AVIATION SNIP - STRAIGHT",975.0],[94,"BABY COMMED SEAT COVER",1200.0],[95,"BABY COMMED SEAT COVER WITH HANDLE (1913)",1200.0],[96,"BABY ONE UNIT COMMED (2505)",26500.0],[97,"BACK TO WALL COMMED RMR - 009 (1277)",42000.0],[98,"BACK TO WALL RIMLESS BLACK COMMED (2534)",64500.0],[99,"BALL PUMP - 13",310.0],[100,"BALL VALVE 1\"",300.0],[101,"BALL VALVE BRASS 1/2\" RMR",850.0],[102,"BALL VALVE BRASS RMR 1/2\" (1360)",935.0],[103,"BALL VALVE BRASS RMR 3/4\"",1560.0],[104,"BALL VALVE BRASS RMR 1\" (1359)",1950.0],[105,"BALL VALVE BRASS RMR 11/2\" (1358)",3650.0],[106,"BALL VALVE BRASS RMR 2\" (1361)",4750.0],[107,"BALL VALVE BRASS VENUS 1/2\"",985.0],[108,"BALL VALVE PVC 1 1/4\"",465.0],[109,"BALL VALVE PVC 1/2\"",115.0],[110,"BALL VALVE PVC 1/2\" HEAVY",225.0],[111,"BALL VALVE PVC 3/4\"",175.0],[112,"BALL VALVE PVC 3/4\" HEAVY",175.0],[113,"BALL VALVE PVC HEAVY 1 1/2\" - FORCE",990.0],[114,"BALL VALVE PVC HEAVY 1\" - FORCE",495.0],[115,"BALL VALVE PVC HEAVY 1/2\" - FLOW TEC",225.0],[116,"BALL VALVE PVC HEAVY 1/2\" - FORCE",225.0],[117,"BALL VALVE PVC HEAVY 2\" - FORCE",990.0],[118,"BARREL NIPPLE 1/2'' [1029]",110.0],[119,"BARREL NIPPLE BRASS 1/2\" (1321)",275.0],[120,"BARREL NIPPLE SS 1\"",300.0],[121,"BARREL NIPPLE SS 1/2\"",95.0],[122,"BARREL PUMP LEVER TYPE",5950.0],[123,"BASIN LONG PADESTAL BLACK RMR (2442)",32500.0],[124,"BASIN LONG PADESTAL TILE RMR 2241 (2421)",25500.0],[125,"BASIN MIXER NUT ONLY (1489)",525.0],[126,"BASIN NAIL KING (1178)",280.0],[127,"BASIN NAIL VENUS (1363)",225.0],[128,"BASIN POP WAST 1 1/4\" - NICKEL",890.0],[129,"BASIN POP WAST 1 1/4\" SS RMR (1323)",890.0],[130,"BASIN POP WAST 1 1/4\" ZINC - HOODA (1669)",775.0],[131,"BASIN POP WAST 1 1/4\" ZINC RMR",775.0],[132,"BASIN RMR (2332)",null],[133,"BASIN TAP - PLM (1190)",4290.0],[134,"BASIN TAP GALLAXY RANGE (1166)",1890.0],[135,"BASIN TAP HEAVY RMR - 15 (2367)",3250.0],[136,"BASIN TAP HEAVY RMR - 16 (2369)",null],[137,"BASIN TAP I LOOK INDIA",465.0],[138,"BASIN TAP LIVER FAUCET",1550.0],[139,"BASIN TAP LONG BLACK 3810-5 (2502)",6350.0],[140,"BASIN TAP LONG BLACK RMR 3812-5 (2562)",6150.0],[141,"BASIN TAP LONG BLACK UP LIVER (2457)",6350.0],[142,"BASIN TAP LONG CHROME RMR 3812-3 (1347)",6200.0],[143,"BASIN TAP LONG RMR (2055-15)",4890.0],[144,"BASIN TAP MIXER RMR (1247",7250.0],[145,"BASIN TAP SQUARE - DLF",3175.0],[146,"BASIN TAP SQUARE BLACK RMR (2378)",3150.0],[147,"BASIN TAP SQUARE RME - 08 (1421)",3350.0],[148,"BASIN TAP SQUARE RMR RANGE (1680)",3250.0],[149,"BASIN TAP URENOS",2250.0],[150,"BASIN WAST 1 1/4\" - 1 1/2\" - IND",590.0],[151,"BASIN WAST 1 1/4\" GO WARE IND",690.0],[152,"BASIN WASTE 1 1/4\" CHAIN RMR (1267)",925.0],[153,"BATHROOM ACCESSORIES 6PCS SET",6500.0],[154,"BATHROOM ACCESSORIES 7PCS SET [1476]",5850.0],[155,"BATHROOM ACCESSORIES 7PCS SET RMR - CROME [2308]",12500.0],[156,"BATHROOM ACCESSORIES 7PCS SET RMR - MAT [2310]",13500.0],[157,"BATHROOM ACCESSORIES SET BLACK",7500.0],[158,"BATHROOM ACCESSORIES SET DURA",6750.0],[159,"BATHROOM DOOR LOCK",950.0],[160,"BATHROOM SCALE DIGITAL 180KG",2900.0],[161,"BATHROOM SHOWER CURTAIN FABRIC (1050)",1225.0],[162,"BATTERY AA (AKS)",65.0],[163,"BATTERY AAA (AKS)",60.0],[164,"BATTERY D 1.5V AKKO STAR",175.0],[165,"BEARING 6201 NSK",210.0],[166,"BEARING 6202 NSK",225.0],[167,"BEARING 6203 NSK",250.0],[168,"BEARING 6204 NSK",280.0],[169,"BEARING 6205 NSK",315.0],[170,"BELL BIRD",550.0],[171,"BELL DING DONG",695.0],[172,"BICYCLE PUMP METER 09",1390.0],[173,"BICYCLE PUMP BODY UP - 12",750.0],[174,"BICYCLE PUMP BODY UP HEAVY 08",990.0],[175,"BICYCLE PUMP BODY UP LIGHT 06",725.0],[176,"BICYCLE PUMP LEVER UP 07",990.0],[177,"BIDET HEAD CHROME (1514)",415.0],[178,"BIDET HEAD PVC BLUE (1513)",285.0],[179,"BIDET HEAD PVC GREEN (1511)",285.0],[180,"BIDET HEAD PVC IVORY [1509]",285.0],[181,"BIDET HEAD PVC PINK (1510)",285.0],[182,"BIDET HEAD PVC WHITE (1508)",285.0],[183,"BIDET HEAD SS SQUARE (1464)",1225.0],[184,"BIDET HOLDE SS (1042)",475.0],[185,"BIDET HOLDER CHROME (1042)",160.0],[186,"BIDET HOLDER CHROME ADJUSTABLE (1671)",195.0],[187,"BIDET HOLDER PVC WHITE (1289)",115.0],[188,"BIDET SPRAY CP BAG GALLAXY (1775)",950.0],[189,"BIDET SPRAY CP COATED SHATTAF GALLAXY (1221)",1750.0],[190,"BIDET SPRAY PVC BLACK GALLAXY (1380)",595.0],[191,"BIDET SPRAY PVC BLUE GALLAXY (1560)",595.0],[192,"BIDET SPRAY PVC GREEN GALLAXY (1561)",595.0],[193,"BIDET SPRAY PVC IVORY GALLAXY (1559)",595.0],[194,"BIDET SPRAY PVC MAROON GALLAXY (1598)",595.0],[195,"BIDET SPRAY PVC PINK GALLAXY (1562)",595.0],[196,"BIDET SPRAY PVC WHITE GALLAXY (1558)",610.0],[197,"BIDET SPRAY PVC WHITE POLO",595.0],[198,"BIDET SPRAY SPRING CP COATED SHATTAF SPRING (1596)",1650.0],[199,"BIDET SPRAY SPRING PVC WHITE GALLAXY (1381)",650.0],[200,"BIDET SPRAY SQUARE BLACK RMR [2451]",null],[201,"BIDET SPRAY SS ROUND RMR - (1910)",3150.0],[202,"BIDET SPRAY SS SQUARE RMR - SML (1624)",3150.0],[203,"BIDET SPRAY SS SQUARE RMR BIG (1216)",3150.0],[204,"BIDET SPRAY SS SQUARE SML HOODA (1457)",2950.0],[205,"BIDET SPRAY ZINC SQUARE SHATTAF GALLAXY (2120)",3100.0],[206,"BIDET SPRAY ZINC SQUARE SML GALLAXY (2120)",2575.0],[207,"BINDING HACKER",345.0],[208,"BIP TAP - PLM",3240.0],[209,"BIP TAP ABS HEAVY GALLAXY (2509)",200.0],[210,"BIP TAP GALLAXY RANGE (1167)",1525.0],[211,"BIP TAP NICKEL FAUCET",1490.0],[212,"BIP TAP PVC LIVER GALLAXY (1491)",125.0],[213,"BIP TAP PVC LIVER HEAVY",125.0],[214,"BIP TAP PVC VISION HEAVY",200.0],[215,"BIP TAP SQUARE - DLF",2750.0],[216,"BIP TAP SQUARE BLACK RMR (2379)",2750.0],[217,"BIP TAP SQUARE RMR RANGE (1681)",2900.0],[218,"BIP TAP SS SQUARE - DLF",2750.0],[219,"BIRD CARD NIGHT LATCH",1350.0],[220,"BIRD NIGHT LATCH NO 1",1490.0],[221,"BLACK HAND MADE SINK WITH KNIFE 50*40 RMR (1483)",13900.0],[222,"BLACK POWDER 1KG",685.0],[223,"BLACK POWDER DRUMP 20 KG",15000.0],[224,"BLACK ROUND COMMED SEAT COVER S/D HEAVY",2690.0],[225,"BLEACHING POWDER BAG - VIKRAM",5400.0],[226,"BLEACHING POWDER DRUMP - DCM",17500.0],[227,"BLOCKAGE JERMINATOR",525.0],[228,"BLUE POWDER CEMENT",1450.0],[229,"BOOSTER CABLE 1000 AMP",2850.0],[230,"BOSUN DIAMOND CUP WHEEL 4 1/2\"",850.0],[231,"BOSUN DIAMOND CUP WHEEL 4\"",650.0],[232,"BOSUN DIAMOND WHEEL 4 1/2\"",230.0],[233,"BOSUN DIAMOND WHEEL 4\"",215.0],[234,"BOTTLE TRAP 11/4\" SS HEAVY RMR (1517)",2850.0],[235,"BOTTLE TRIGGER",200.0],[236,"BOWL SINK SS",3200.0],[237,"BOWL SINK WASTE WITH PIPE SET DOUBLE (2192)",1750.0],[238,"BOWL SINK WASTE WITH PIPE SET SINGLE (1187)",1350.0],[239,"BOWTH 100W (AKS)",1950.0],[240,"BOWTH 40W (AKS)",750.0],[241,"BOWTH 60W (AKS)",850.0],[242,"BOX PANTRY HANDLE 6\" BLACK",240.0],[243,"BOX SOCKET 24 PCS HEAVY",7850.0],[244,"BOX SOCKET SET 10PCS HEAVY",2250.0],[245,"BOX SOCKET SET 32PCS HEAVY",7250.0],[246,"BOX SOCKET SET 37PCS HEAVY",9250.0],[247,"BP BUT HINGES 1 1/2\"",480.0],[248,"BP BUT HINGES 2 1/2\"",750.0],[249,"BP BUT HINGES 2\"",590.0],[250,"BP BUT HINGES 3\"",850.0],[251,"BP PAD LOCK 20MM",115.0],[252,"BP PAD LOCK 25MM",150.0],[253,"BP PAD LOCK 30MM",205.0],[254,"BP PAD LOCK 40MM",245.0],[255,"BP PAD LOCK 40MM LONG",375.0],[256,"BP PAD LOCK 50MM",350.0],[257,"BP PAD LOCK 50MM LONG",450.0],[258,"BP PAD LOCK 60MM",675.0],[259,"BP PAD LOCK LONG 38MM",345.0],[260,"BRANCA CUTTING WHEEL 4 1/2 - TIN",65.0],[261,"BRANCA CUTTING WHEEL 4\" - BOX",50.0],[262,"BRANCA CUTTING WHEEL 4\" - TIN",55.0],[263,"BRASS ELBOW 1/2\" (1317)",425.0],[264,"BRASS FITTING (2463)",null],[265,"BRASS FITTING (2591)",null],[266,"BRASS FITTINGS UR 6",365.0],[267,"BRASS POP WAST CERAMIC HEAD RMR (1575)",2350.0],[268,"BRASS SOCKET 1/2\" (1319)",425.0],[269,"BRASS SOCKET 3/4*1/2 (1322)",195.0],[270,"BRASS TAP NUT (1739)",285.0],[271,"BRASS TEE 1/2\"",495.0],[272,"BRASS WASTE NUT (2188)",375.0],[273,"BRASS WELDING ROD 1/8\"",6450.0],[274,"BROWN POWDER 1KG",1350.0],[275,"BRUSH CUTTER BLADE 10\"",850.0],[276,"BRUSH CUTTER RECHARGEABLE",6950.0],[277,"BRUSH HOLDER CERAMIC GALLAXY BAG ROUND (2300)",1450.0],[278,"BRUSH HOLDER DOUBLE SQUARE GLASS RMR (2299)",2990.0],[279,"BRUSH HOLDER GLASS GALLAXY BAG (1061)",1100.0],[280,"BRUSH HOLDER GLASS SQUARE BLACK WESDA (2416)",1990.0],[281,"BRUSH HOLDER ROUND DOUBLE 304 RMR (1062)",2990.0],[282,"BRUSH HOLDER ROUND GLASS ONLY (1113)",410.0],[283,"BRUSH HOLDER ROUND SINGLE GLASS 304 RMR (1533)",1990.0],[284,"BRUSH HOLDER SQUARE DOUBLE 304 RMR (1061)",2990.0],[285,"BRUSH HOLDER SQUARE GLASS ONLY (1818)",425.0],[286,"BRUSH HOLDER SQUARE GLASS WESDA (2036)",1780.0],[287,"BRUSH HOLDER SQUARE SINGLE BLACK RMR (1696)",1990.0],[288,"BRUSH HOLDER SQUARE SINGLE GLASS 304 RMR (1213)",1975.0],[289,"BRUSH HOLDER SS HANGING MODEL (2512)",750.0],[290,"BRUSH HOLDER SS WITH GLASS (1655)",695.0],[291,"BRUSH HOLDER WITH DISPENCER WESDA (2414)",2750.0],[292,"BULB 5W ASST",65.0],[293,"BUS BAR",18.05],[294,"CABINET JACK SUPPORT 120\" 10FT",null],[295,"CABINET JACK SUPPORT 60\" 5FT",null],[296,"CABLE CLIP 10MM",240.0],[297,"CABLE CLIP 4MM",150.0],[298,"CABLE CLIP 5MM",160.0],[299,"CABLE CLIP 6MM",170.0],[300,"CABLE CLIP 7MM",180.0],[301,"CABLE CLIP 8MM",210.0],[302,"CABLE PULLER 5M STEEL",990.0],[303,"CABLE TIE 2.5MM*100MM BLACK",165.0],[304,"CABLE TIE 3.6MM*150MM BLACK",250.0],[305,"CABLE TIE 3.6MM*200MM BLACK",300.0],[306,"CABLE TIE 3.6MM*250MM BLACK",350.0],[307,"CABLE TIE 3.6MM*300MM BLACK",390.0],[308,"CABLE TIE 3.6MM*350MM BLACK",430.0],[309,"CABLE TIE 3.6MM*400MM BLACK",1150.0],[310,"CABLE TIE 3.6MM*450MM BLACK",1150.0],[311,"CALIPER ANALOG",1975.0],[312,"CALIPER DIGITAL 6\"",3100.0],[313,"CAP NUT SS 04MM",12.0],[314,"CAP NUT SS 05MM",14.0],[315,"CAP NUT SS 1/2 (12MM)",48.0],[316,"CAP NUT SS 3/8 (10MM)",35.0],[317,"CAP NUT SS 6MM (1/4)",15.0],[318,"CAP NUT SS 8MM (5/16)",25.0],[319,"CAPACITOR BOX 1.5\u00b5F",110.0],[320,"CAPACITOR BOX 2.5\u00b5F",125.0],[321,"CAPACITOR BOX 3.5\u00b5F",135.0],[322,"CAPESITER 12 UF",420.0],[323,"CAPESITER 16 UF",450.0],[324,"CAPESITER 20 UF",510.0],[325,"CAPESITER 200 UF",800.0],[326,"CAPESITER 25 UF",590.0],[327,"CAPESITER 250 UF",850.0],[328,"CAPESITER 30 UF",645.0],[329,"CAPESITER 300 UF",950.0],[330,"CAPESITER 35 UF",790.0],[331,"CAPESITER 40 UF",820.0],[332,"CAPESITER 45 UF",850.0],[333,"CAPESITER 50 UF",850.0],[334,"CARTRIDGE FULL TURN MONO TYPE PREMIUM (1388)",750.0],[335,"CARTRIDGE FULL TURN LONG BRASS (1666)",750.0],[336,"CARTRIDGE FULL TURN SHORT BRASS",700.0],[337,"CARTRIDGE GALLACE LONG TYPE",875.0],[338,"CARTRIDGE HALF TURN LONG BRASS (2157)",675.0],[339,"CARTRIDGE HALF TURN SHORT BRASS",625.0],[340,"CARTRIDGE SINK TAP BRASS",700.0],[341,"CASEMENT STAYS OXFORD 9\"",345.0],[342,"CAST IRON ROD (2.5) - 12",2950.0],[343,"CASTER WHEEL LOCK 3\"",750.0],[344,"CASTER WHEEL LOCK 4\"",900.0],[345,"CEILING FAN KDK BLACK",13500.0],[346,"CEILING FAN KDK WHITE",12000.0],[347,"CEILING ROSE YASHODA WHITE",79.0],[348,"CERAMIC ACCESSORIES 4PCS SET (2467)",2475.0],[349,"CERAMIC SOAP DISH WITH HOLDER GALLAXY BAG ROUND (2301)",1450.0],[350,"CHAIN LOCK - BARREL NICKEL",765.0],[351,"CHAIN LOCK - SQUARE BLACK",655.0],[352,"CHAIN SAW CHAIN 11.5\"",810.0],[353,"CHAIN SAW CHAIN 22\"",2160.0],[354,"CHAIN SAW FILE OREGON - 05/32",2340.0],[355,"CHAIN SAW FILE OREGON - 07/32",2340.0],[356,"CHAIN SAW FILE OREGON - 3/16",2340.0],[357,"CHERRY BULB 28L MULTY",590.0],[358,"CHICKEN MESH GI 1M*30M HEAVY",null],[359,"CHICKEN MESH GI CHINA 1M*30M",7500.0],[360,"CHICKEN MESH PVC 1M*30M",10750.0],[361,"CHINA HACKSAW BLADE",2700.0],[362,"CHIPPING HAMMER FIBRE HANDLE 300G",685.0],[363,"CHIPPING HAMMER STEEL HANDLE 300G",650.0],[364,"CHLORINE AQUACHLOR 70%",42500.0],[365,"CIRCLIP PLAIR IN",725.0],[366,"CIRCLIP PLAIR OUT",725.0],[367,"CISTERN FITTING COBRA HANDLE TYPE",595.0],[368,"CISTERN FITTING HEAVY GRAY RMR (2318)",1550.0],[369,"CISTERN FITTING NEW PACK",1350.0],[370,"CISTERN FITTING ONE UNIT - 13",1350.0],[371,"CISTERN FITTING ONE UNIT SQUARE BUTTON (2180)",1450.0],[372,"CISTERN FITTING REYIDA",1190.0],[373,"CISTERN FITTING REYIDA 20CM (1948)",1050.0],[374,"CISTERN FITTING SIDE HANDLE - 13",1390.0],[375,"CISTERN FITTING SIPHON ONLY (1036)",890.0],[376,"CISTERN FITTING SIPHON ONLY RMR (1206)",890.0],[377,"CISTERN HANDLE ONLY (1044)",450.0],[378,"CISTERN NOB - SMALL (1049)",190.0],[379,"CISTERN NOB LARGE (2507)",225.0],[380,"CISTERN NOB MEDIUM (1801)",275.0],[381,"CISTERN NOB SQUARE (2128)",475.0],[382,"CISTERN RUBBER WASHER ONLY - REYIDA (1553)",265.0],[383,"CISTERN SS NAIL (1792)",325.0],[384,"CISTERN TANK PVC - SQUARE BUTTON (1630)",4250.0],[385,"CISTERN TANK ROUND BUTTON (1629)",4690.0],[386,"CLAW HAMMER F/H 0.25 - AMERICAN",625.0],[387,"CLAW HAMMER F/H 0.5 - AMERICAN",725.0],[388,"CLAW HAMMER F/H 0.75 - AMERICAN",825.0],[389,"CLAW HAMMER W/H 0.25G",575.0],[390,"CLAW HAMMER W/H 0.50G",685.0],[391,"CLAW HAMMER W/H 0.75G",795.0],[392,"CLEAR HOSE 1/2\" (12MM) 30M",3985.0],[393,"CLEAR HOSE 1/4\" (6MM) 30M",1750.0],[394,"CLEAR HOSE 3/8\" (10MM) 30M",2800.0],[395,"CLEAR HOSE 5/16\" (8MM) 30M",2180.0],[396,"CMMED SEAT COVER BACK TOWALL RMR (1477)",3150.0],[397,"CMMED SEAT COVER BACK TOWALL RMR (1478)",3485.0],[398,"COB RECHARGEABLE KEYCHAIN LIGHT AKKO STAR",1150.0],[399,"COCONUT SCRAPER",null],[400,"CODE SWITCH (AKS)",145.0],[401,"COLT CHISEL 08\" FLAT",360.0],[402,"COLT CHISEL 08\" POINT",360.0],[403,"COLT CHISEL 10\" FLAT",460.0],[404,"COLT CHISEL 10\" POINT",460.0],[405,"COLT CHISEL 12\" FLAT",null],[406,"COMBINATION 14PCS KEY SET - DIAMOND",null],[407,"COMBINATION KEY 08MM",null],[408,"COMBINATION KEY 12MM",175.0],[409,"COMBINATION KEY 13MM",195.0],[410,"COMBINATION KEY 14MM",215.0],[411,"COMBINATION KEY 15MM",235.0],[412,"COMBINATION KEY 16MM",255.0],[413,"COMBINATION KEY 17MM",null],[414,"COMBINATION KEY 8 PCS SET",2900.0],[415,"COMBINATION KEY 9 PCS SET (8-24MM)",3150.0],[416,"COMBINATION KEY CRV 08MM",195.0],[417,"COMBINATION KEY CRV 10MM",225.0],[418,"COMBINATION KEY CRV 11MM",240.0],[419,"COMBINATION KEY CRV 12MM",245.0],[420,"COMBINATION KEY CRV 13MM",270.0],[421,"COMBINATION KEY CRV 14MM",295.0],[422,"COMBINATION KEY CRV 17MM",370.0],[423,"COMBINATION PLAIR 8\" - 1000V",1450.0],[424,"COMBINATION PLAIR 8\" - DIAMOND",null],[425,"COMBINATION PLAIR 8\" - RED GRIP",645.0],[426,"COMBINATION PLAIR 8\" HEAVY - VIP",695.0],[427,"COMBINATION PLAIR 8\" HEAVY- OUSHIDA",1200.0],[428,"COMBINATION PLAIR HEAVY 8\"",645.0],[429,"COMBINATION PLAIR HEAVY 8\" A+",645.0],[430,"COMBINATION PLAIR VIP- FMZ",750.0],[431,"COMBINATION SPANNER 10PCS - CR-V",2950.0],[432,"COMBINATION SPANNER 14PCS YEII",5500.0],[433,"COMBINATION SPANNER 14PCS YEII 8-24",3975.0],[434,"COMBINATION SPANNER SET 8PCS",2850.0],[435,"COMBINATION STONE 6\"",null],[436,"COMMED DIAMOND CUT ONE UNIT (1700)",39000.0],[437,"COMMED L SHAPE BRACKET (1045)",375.0],[438,"COMMED NAIL KING (04 NAILS) (1179)",265.0],[439,"COMMED NAIL VENUS (1364)",195.0],[440,"COMMED ONE UNIT RIMLESS [2533]",43500.0],[441,"COMMED ROUND RMR (1588)",32500.0],[442,"COMMED SEAT COVER - BLUE",1290.0],[443,"COMMED SEAT COVER - GREEN",1290.0],[444,"COMMED SEAT COVER - PINK",1290.0],[445,"COMMED SEAT COVER - WHITE",1290.0],[446,"COMMED SEAT COVER IVORY (1158)",1290.0],[447,"COMMED SEAT COVER IVORY HOODA (1867)",2250.0],[448,"COMMED SEAT COVER IVORY SQUARE S/D HEAVY (1971)",3290.0],[449,"COMMED SEAT COVER IVORY SQUARE S/D HEAVY",3290.0],[450,"COMMED SEAT COVER MAROON S/D HEAVY - RMR",1990.0],[451,"COMMED SEAT COVER NAIL - PVC (2209)",195.0],[452,"COMMED SEAT COVER S/D HEAVY BLUE ROUND RMR (1526)",2690.0],[453,"COMMED SEAT COVER WHITE HOODA (1866)",2250.0],[454,"COMMED SET (1241)",46000.0],[455,"COMMED SQUARE (2470)",43000.0],[456,"COMMED SQUARE GRAY FULL SET (AS305 G)",84000.0],[457,"COMMED SQUARE ONE UNIT (2024)",42500.0],[458,"COMMED SQUARE WHITE (1278)",42500.0],[459,"COMMED WHITE SQUARE (AS1004)",40000.0],[460,"COMPRESSOR HOSE 10M",1950.0],[461,"CONCEALED VALVE SQUARE - DLF",2800.0],[462,"CONCREAT BIT 8MM",120.0],[463,"CONCRETE BIT 10MM",175.0],[464,"CONCRETE BIT 12MM",240.0],[465,"CONCRETE BIT 14MM",285.0],[466,"CONCRETE BIT 5MM",80.0],[467,"CONCRETE BIT 6MM",90.0],[468,"CONCRETE BIT 7MM",100.0],[469,"CONCRETE CUP WHEEL 4 INCH",null],[470,"CONCRETE CUP WHEEL 4.5",null],[471,"CONCRETE NAIL - 1 1/2\"",565.0],[472,"CONCRETE NAIL - 1\"",565.0],[473,"CONCRETE NAIL - 2 1/2\"",565.0],[474,"CONCRETE NAIL - 2\"",565.0],[475,"CONCRETE NAIL - 3\"",565.0],[476,"CONCRETE NAIL - 4\"",565.0],[477,"CONNECTER BAR 13A",135.0],[478,"CONNECTER BAR 5A",98.0],[479,"CONSIL VALVE 1/2\" - DLF",3190.0],[480,"CONSIL VALVE 1/2\" - PLM (1429)",3190.0],[481,"CONSILE VALVE 1/2\" GALLAXY RANGE (1172)",2390.0],[482,"CONSILE VALVE 1/2\" RMR RANGE",2900.0],[483,"CONSILE VALVE 1/2\" SQUARE RMR RANGE (1683)",2850.0],[484,"CONSILE VALVE 3/4\" - PLM (1192)",3695.0],[485,"CONSILE VALVE 3/4\" SQUARE RMR RANGE (1684)",3200.0],[486,"CONVENTION HOLDER P/S",80.0],[487,"CONVENTION HOLDER S/P",80.0],[488,"CORD SWITCH CHINA",45.0],[489,"CORD SWITCH INDIA",80.0],[490,"CORD SWITCH YELLOW",75.0],[491,"CORNER SHELF DOUBLE WESDA (1656)",2750.0],[492,"CORNER SHELF GLASS SINGLE WESDA [1737]",1750.0],[493,"CORNER SHELF SINGLE WESDA (1657)",1690.0],[494,"COTTON FILTER (2037)",290.0],[495,"COTTON FILTER (2040)",350.0],[496,"CP CAP - BUBBLE",50.0],[497,"CP CAP - FLAT",50.0],[498,"CP CAP - SQUARE (1108)",75.0],[499,"CROCODILE CUTLASS",1100.0],[500,"CROSS TEE 2' - BLACK LINE",65.0],[501,"CROSS TEE 2' - WHITE GROOVE",54.0],[502,"CROSS TEE TEAK 2'",67.5],[503,"CROW BAR 25MM 4FT (HEAVY)",3100.0],[504,"CROW BAR 25MM 5FT (HEAVY)",3650.0],[505,"CROW BAR 25MM 6FT (HEAVY)",4350.0],[506,"CRYSTAL LED MIRROR ROUND (356)",20500.0],[507,"CSK SCREW 1 1/2 \u00d7 10",1450.0],[508,"CSK SCREW 1 1/2 \u00d7 7",2285.0],[509,"CSK SCREW 1 1/2 \u00d7 8",2250.0],[510,"CSK SCREW 1 1/4 \u00d7 10",1465.0],[511,"CSK SCREW 1 1/4 \u00d7 7",2125.0],[512,"CSK SCREW 1 1/4 \u00d7 8",2285.0],[513,"CSK SCREW 1 \u00d7 08",1800.0],[514,"CSK SCREW 1 \u00d7 10",2250.0],[515,"CSK SCREW 2 1/2 \u00d7 8",2450.0],[516,"CSK SCREW 2 \u00d7 10",1985.0],[517,"CSK SCREW 2 \u00d7 8",1720.0],[518,"CSK SCREW 1/2*4",1670.0],[519,"CSK SCREW 1/2*5",1690.0],[520,"CSK SCREW 2 1/2 \u00d7 08",2450.0],[521,"CSK SCREW 2 1/2 \u00d7 10",2000.0],[522,"CSK SCREW 2 \u00d7 10",3780.0],[523,"CSK SCREW 2 \u00d7 8",2180.0],[524,"CSK SCREW 3 \u00d7 8",2180.0],[525,"CSK SCREW 3/4\u00d77",1785.0],[526,"CSK SCREW 4 \u00d7 10",2690.0],[527,"CSK SCREW 5/8 \u00d7 5",1950.0],[528,"CSK SCREW 5/8 \u00d7 6",1812.0],[529,"CUP BRUSH BRASS - 4 1/2\"",275.0],[530,"CUP BRUSH BRASS - 4\"",280.0],[531,"CUP BRUSH FOR DRILL - 3PCS",685.0],[532,"CUP BRUSH FOR DRILL - 5PCS",830.0],[533,"CUP BRUSH FOR DRILL - 6PCS",895.0],[534,"CUP BRUSH IRON - 4 1/2\"",280.0],[535,"CUP BRUSH IRON - 4\"",280.0],[536,"CUP HOOKS 1 1/2\"",1650.0],[537,"CUP HOOKS 1\"",920.0],[538,"CUP HOOKS 2\"",2100.0],[539,"CUP HOOKS 3/4\"",920.0],[540,"CURRENT CIRCUIT BREAKER RCBO AKKO STAR",3500.0],[541,"CURTAIN BOX RUNNERS",2675.0],[542,"CURTAIN END CAP",null],[543,"CURTAIN END CAP - PVC",19.5],[544,"CURTAIN HOOKS & EYES",375.0],[545,"CURTAIN PIN HOOKS",1290.0],[546,"CURTAIN SINGLE BRACKET P/C",32.5],[547,"CURTAIN WIRE 25MTR",1275.0],[548,"CURTAIN WIRE 30MTR",1400.0],[549,"CUT PLANE IRON 1 1/2\"",3540.0],[550,"CUT PLANE IRON 1 3/4\"",3540.0],[551,"CUTTING PLAIR 8\" HEAVY - VIP",695.0],[552,"CUTTING PLAIR HEAVY 8\"",795.0],[553,"CUTTING PLAIR HEAVY 8\" A+",625.0],[554,"CUTTING WHEEL 14\"",775.0],[555,"CUTTING WHEEL 4 1/2\" TIN - JOSILI",68.0],[556,"CUTTING WHEEL 4\" TIN - JOSILI",58.0],[557,"CUTTING WHEEL BRANCA 4 1/2\" - BOX",55.0],[558,"DEEP BOWL SINK 21*18 RMR (1265)",4800.0],[559,"DEEP BOWL SINK 21*18 RMR BLACK",4800.0],[560,"DEEP BOWL SINK 24*18 RMR (1678)",5750.0],[561,"DEEP BOWL SINK 27*18 RMR (1926)",6800.0],[562,"DEEP BOWL SINK 50\u00d740 RMR (1472)",3675.0],[563,"DEEP BOWL SINK 60\u00d745 RMR (1264)",3850.0],[564,"DEEP SOCKET SET BLACK 10PCS",2150.0],[565,"DIAMOND CUTTING WHEEL GREEN 4 1/2\"",875.0],[566,"DIAMOND CUTTING WHEEL GREEN 4\"",800.0],[567,"DIGITAL BLUETOOTH SHOWER PANEL - GLOSS BLACK",45000.0],[568,"DIGITAL BLUETOOTH SHOWER PANEL - SILVER",45000.0],[569,"DISTRIBUTION BOX 11-14 AKKO STAR",2300.0],[570,"DISTRIBUTION BOX 5-7 AKKO STAR",1875.0],[571,"DISTRIBUTION BOX 8-10 AKKO STAR",2000.0],[572,"DOG BELT HEAVY 92",220.0],[573,"DOG BELT HEAVY 93",250.0],[574,"DOG BELT HEAVY 94",280.0],[575,"DOG BELT HEAVY 95",345.0],[576,"DOG BELT HEAVY 96",400.0],[577,"DOG BELT POLICE - SMALL",393.0],[578,"DOG BELT PRO",1120.0],[579,"DOG BELT PRO MAX",1300.0],[580,"DOG CHAIN 20",2240.0],[581,"DOG CHAIN 22",2540.0],[582,"DOG CHAIN 25",2720.0],[583,"DOG CHAIN 30",3140.0],[584,"DOG CHAIN 35",3680.0],[585,"DOG CHAIN 40",4160.0],[586,"DOG CHAIN 45",4520.0],[587,"DOG CHAIN 50",5480.0],[588,"DOG CHAIN RING 30",525.0],[589,"DOG CHAIN RING 40",625.0],[590,"DOG CHAIN RING 50",825.0],[591,"DOG LEAD BLACK 02MM",210.0],[592,"DOG LEAD BLACK 03MM",330.0],[593,"DOG LEAD BLACK 04MM",485.0],[594,"DOG LEAD BLACK 05MM",685.0],[595,"DOG LEAD BLACK 2.5MM",270.0],[596,"DOG LEAD BLACK 3.5MM",390.0],[597,"DOG LEAD NICKEL 2.0MM",190.0],[598,"DOG LEAD NICKEL 2.5MM",225.0],[599,"DOOR CLOSER",2750.0],[600,"DOOR CLOSER HEAVY",2850.0],[601,"DOOR LOCK LINCY - 1",3450.0],[602,"DOOR PULL P/C 4\"",385.0],[603,"DOOR PULL P/C 5\"",550.0],[604,"DOOR PULL P/C 6\"",660.0],[605,"DOOR STOP HOLDER",null],[606,"DOUBLE BOWL SINK 78*43 L RMR (1425)",6950.0],[607,"DOUBLE HOLDER",285.0],[608,"DOUBLE NANO TAPE - 1 MTR",195.0],[609,"DOUBLE NANO TAPE - 2MTR",330.0],[610,"DOUBLE NANO TAPE - 3 MTR",340.0],[611,"DOUBLE TAPE INDIA",115.0],[612,"DRAIN CLEANER 3M",585.0],[613,"DRAWER LOCK 22MM - DOUBLE",350.0],[614,"DRAWER LOCK 25MM - DOUBLE",415.0],[615,"DRAWER LOCK 26MM - DOUBLE",425.0],[616,"DRAWER LOCK 32MM - DOUBLE",375.0],[617,"DRAWER LOCK 38MM - DOUBLE",475.0],[618,"DRAWER LOCK 808 BP",190.0],[619,"DRAWER LOCK BIRD NO.1 BRASS",9300.0],[620,"DRAWER LOCK BO8 BP",195.0],[621,"DRAWER LOCK ELEPHANT 22MM - DOUBLE",250.0],[622,"DRAWER LOCK ELEPHANT 32MM - DOUBLE",325.0],[623,"DRAWER LOCK SUMO",210.0],[624,"DRAWER LOCK VISION",210.0],[625,"DRILL BIT GOLD 1/2\"",250.0],[626,"DRILL BIT GOLD 1/4\"",70.0],[627,"DRILL BIT GOLD 1/8\"",30.0],[628,"DRILL BIT GOLD 3/8\"",125.0],[629,"DRILL BIT HIGH SPEED 1/8\"",110.0],[630,"DRILL BIT HIGH SPEED 3/16\"",210.0],[631,"DRILL BIT SET 13PCS",null],[632,"DRILL CHUCK 10MM PUSH",650.0],[633,"DRILL CHUCK 10MM THREAD",650.0],[634,"DRILL CHUCK 13MM B16 PUSH",775.0],[635,"DRILL CHUCK 13MM UNF THREAD",865.0],[636,"DRILL CHUCK 16MM B16 PUSH",1510.0],[637,"DRILL CHUCK 16MM UNF THREAD",1390.0],[638,"DRILL CHUCK KEY 13MM",155.0],[639,"DRY WALL SCREW 1/2\" \u00d7 06",1580.0],[640,"DRY WALL SCREW 1/2\" \u00d7 08",1580.0],[641,"DRY WALL SCREW 2 \u00d7 6",2100.0],[642,"DRY WALL SCREW 2 \u00d7 7",2350.0],[643,"DRY WALL SCREW 2 \u00d7 8",2550.0],[644,"DRY WALL SCREW 3 \u00d7 10",2590.0],[645,"DRY WALL SCREW 3/4\" \u00d7 6",1830.0],[646,"DRY WALL SCREW 3/4\" \u00d7 7",2190.0],[647,"DRY WALL SCREW 3/4\" \u00d7 8",2290.0],[648,"DRY WALL SCREW 1 1/2 \u00d7 06",1100.0],[649,"DRY WALL SCREW 1 1/2 \u00d7 07",1390.0],[650,"DRY WALL SCREW 1 1/2 \u00d7 08",1485.0],[651,"DRY WALL SCREW 1 1/2 \u00d7 10",2450.0],[652,"DRY WALL SCREW 1 1/4 \u00d7 07",1390.0],[653,"DRY WALL SCREW 1 1/4 \u00d7 08",1390.0],[654,"DRY WALL SCREW 1\" \u00d7 06",2160.0],[655,"DRY WALL SCREW 1\" \u00d7 07",2520.0],[656,"DRY WALL SCREW 1\" \u00d7 08",2670.0],[657,"DRY WALL SCREW 1\" \u00d7 10",1850.0],[658,"DRY WALL SCREW 2 1/2 \u00d7 08",1425.0],[659,"DRY WALL SCREW 2 1/2 \u00d7 10",1565.0],[660,"DRY WALL SCREW 2 \u00d7 10",2750.0],[661,"DRY WALL SCREW 3 \u00d7 8",1485.0],[662,"DRY WALL SCREW 3/4\" \u00d7 10",1425.0],[663,"DRY WALL SCREW 5/8 \u00d7 5",1580.0],[664,"DRY WALL SCREW 5/8\" \u00d7 6",1580.0],[665,"DUCT TAPE HEAVY 10MTR",345.0],[666,"DUCT TAPE HEAVY 25MTR",550.0],[667,"E TYPE SOCKET SET 10PCS",2550.0],[668,"EARTH ROD & CLIP - 8MM",450.0],[669,"EARTH ROD & CLIP 12MM",895.0],[670,"EARTH ROD & CLIP 14MM",1250.0],[671,"EARTH TESTER PEN (AKS)",350.0],[672,"ECO FOIL 3MM SINGLE SIDE - 100M",16900.0],[673,"ECO FOIL 5MM SINGLE SIDE - 50M",null],[674,"ELBOW GLOVE",425.0],[675,"ELECTRIC BOWTH 100W",1100.0],[676,"ELECTRIC BOWTH 40W",595.0],[677,"ELECTRIC BOWTH 60W",690.0],[678,"ELECTRIC BOWTH 80W",910.0],[679,"ELECTRIC METAL TORCH 15W IP45 (AKS)",2975.0],[680,"ELECTRIC MOSQITO RACKET AKKO STAR",1850.0],[681,"ELECTRIC STREET LIGHTING CONTROL 10A AKKO STAR",1100.0],[682,"ELECTRIC WATER HEATER (2613)",16000.0],[683,"ELECTRICAL TESTER PEN AKKO STAR",975.0],[684,"ELEPHANT TORCH 15W (AKS)",3650.0],[685,"EMBOSSING PATTERNED ROLLER 6\"",1195.0],[686,"EMBOSSING PATTERNED ROLLER 7\"",1250.0],[687,"EMERGENCY LAMP 9+1W (AKS)",2490.0],[688,"EMERGENCY LIGHT RECHARGEABLE 0.8W (AKS)",1800.0],[689,"EMERGENCY LIGHT RECHARGEABLE 44W (AKS)",4250.0],[690,"EMERY STONE - CUMI",395.0],[691,"EMERY STONE 6\"",225.0],[692,"EMERY STONE 6\" - CROCODILE",600.0],[693,"EMERY STONE 6\" FIVE TIGER BOX",585.0],[694,"EMERY STONE 8\"",290.0],[695,"EPPO LOCK WOOD HANDLE",1590.0],[696,"EXHAUST FAN 10\"",5450.0],[697,"EXHAUST FAN 12\"",6150.0],[698,"EXHAUST FAN 8\"",4990.0],[699,"EXHAUST FAN STEEL 10\"",6000.0],[700,"EXHAUST FAN STEEL 12\"",6500.0],[701,"EXHAUST FAN STEEL 8\"",5500.0],[702,"EXTENDABLE POLE 2 MTR",720.0],[703,"EXTENDABLE POLE 3MTR",790.0],[704,"EXTENSION NIPPLE - 1/2 & 3/4",195.0],[705,"EXTENSION NIPPLE - NICKEL 1 1/2\"",20.0],[706,"EXTENSION NIPPLE - NICKEL 1\" (2066)",195.0],[707,"EXTENSION NIPPLE - NICKEL 2\" (2064)",270.0],[708,"EXTENSION NIPPLE - NICKEL 3\"",360.0],[709,"EXTENSION NIPPLE 1/2\"",195.0],[710,"EXTENSION NIPPLE BRASS 1/2*3/8 (2463)",null],[711,"EXTENSION WIRE CORD 13A 10MTR",3925.0],[712,"FACE SHIELD HARLEY DAVIDSON",690.0],[713,"FAN BLADE",495.0],[714,"FAN CONDENSER 1.5UF",165.0],[715,"FAN FILTER",80.0],[716,"FAN HOOKS 06MM",57.0],[717,"FAN HOOKS 08MM",88.0],[718,"FAN HOOKS 10 MM",115.0],[719,"FAN HOOKS 12MM",215.0],[720,"FARM TOOL 15\" WOODEN HANDLE",null],[721,"FAUCET ANGEL VALVE SQUARE (1846)",850.0],[722,"FAUCET KITCHEN SINK TAP - (1785)",1650.0],[723,"FIBER MANISH - LARGE",725.0],[724,"FIBER MANISH - SMALL",350.0],[725,"FILE SET 3PCS",1290.0],[726,"FINISHING TROWEL C/N",375.0],[727,"FINISHING TROWEL P/H TEETH",475.0],[728,"FINISHING TROWEL SQUARE TEETH HEAVY",700.0],[729,"FINISHING TROWEL WH TEETH",540.0],[730,"FIRMER CHISEL 1'' HEAVY",null],[731,"FIVE HEAD LIGHT AKKO STAR",900.0],[732,"FLAP DISC 4 1/2\" \u00d7 100",145.0],[733,"FLAP DISC 4 1/2\" \u00d7 120",145.0],[734,"FLAP DISC 4 1/2\" \u00d7 40",145.0],[735,"FLAP DISC 4 1/2\" \u00d7 60",145.0],[736,"FLAP DISC 4 1/2\" \u00d7 80",145.0],[737,"FLAP DISC 4\" \u00d7 100",125.0],[738,"FLAP DISC 4\" \u00d7 120",125.0],[739,"FLAP DISC 4\" \u00d7 40",125.0],[740,"FLAP DISC 4\" \u00d7 60",125.0],[741,"FLAP DISC 4\" \u00d7 80",125.0],[742,"FLAT CHISEL HEAVY 1 1/2\" 38MM",750.0],[743,"FLAT CHISEL HEAVY 1 1/4\" 32MM",700.0],[744,"FLAT CHISEL HEAVY 1\" 25MM",675.0],[745,"FLAT CHISEL HEAVY 1/2\" 12MM",625.0],[746,"FLAT CHISEL HEAVY 1/4\" 6MM",600.0],[747,"FLAT CHISEL HEAVY 2\" 50MM",985.0],[748,"FLAT CHISEL HEAVY 3/4\" 18MM",650.0],[749,"FLAT WASHER 20 \u00d7 50 MM",600.0],[750,"FLAT WASHER 12 \u00d7 30 MM",610.0],[751,"FLAT WASHER 12 \u00d7 35 MM",675.0],[752,"FLAT WASHER 16 \u00d7 30 MM",650.0],[753,"FLAT WASHER 04 \u00d7 16MM",725.0],[754,"FLAT WASHER 04 \u00d7 20MM",725.0],[755,"FLAT WASHER 04 \u00d7 25MM",725.0],[756,"FLAT WASHER 05 \u00d7 16 MM",675.0],[757,"FLAT WASHER 06 \u00d7 16 MM",680.0],[758,"FLAT WASHER 06 \u00d7 20 MM",680.0],[759,"FLAT WASHER 06 \u00d7 25 MM",650.0],[760,"FLAT WASHER 06 \u00d7 30 MM",650.0],[761,"FLAT WASHER 08 \u00d7 20 MM",680.0],[762,"FLAT WASHER 08 \u00d7 25 MM",715.0],[763,"FLAT WASHER 08 \u00d7 30 MM",650.0],[764,"FLAT WASHER 08 \u00d7 35 MM",680.0],[765,"FLAT WASHER 10 \u00d7 25 MM",680.0],[766,"FLAT WASHER 10 \u00d7 30MM",595.0],[767,"FLAT WASHER 10 \u00d7 35 MM",680.0],[768,"FLAT WASHER 10 \u00d7 50MM",625.0],[769,"FLAT WASHER 12 \u00d7 25 MM",675.0],[770,"FLAT WASHER 16 \u00d7 40MM",610.0],[771,"FLAT WASHER 17 \u00d7 25MM",675.0],[772,"FLAT WASHER 19MM",600.0],[773,"FLAT WASHER 20MM",null],[774,"FLAT WASHER 24 \u00d7 50 MM",675.0],[775,"FLAT WASHER 30 \u00d7 50 MM",675.0],[776,"FLAT WASHER 30 \u00d7 60 MM",null],[777,"FLAT WASHER 40MM",null],[778,"FLAT WASHER 40MM (ISO)",640.0],[779,"FLAT WASHER 4MM",700.0],[780,"FLAT WASHER 5MM",595.0],[781,"FLAT WASHER 6MM",700.0],[782,"FLEX TAPE 4''*5FT",650.0],[783,"FLEXIBLE CONDUTE 1 1/4\" - 50 MTR",3550.0],[784,"FLEXIBLE CONDUTE 1\" - 50 MTR",3980.0],[785,"FLEXIBLE CONDUTE 1\" 25MTR",2580.0],[786,"FLEXIBLE CONDUTE 1/2\" - 50 MTR",2800.0],[787,"FLEXIBLE CONDUTE 1/4\"",3490.0],[788,"FLEXIBLE CONDUTE 3/4\" 50 MTR",3350.0],[789,"FLEXIBLE HOSE 1 1/2FT PVC HEAVY NET",360.0],[790,"FLEXIBLE HOSE 1.5FT SS 304 (1988)",550.0],[791,"FLEXIBLE HOSE 1FT",200.0],[792,"FLEXIBLE HOSE 2FT HIGH PRESSURE",460.0],[793,"FLEXIBLE HOSE 2FT PVC",260.0],[794,"FLEXIBLE HOSE 2FT PVC HEAVY NET",385.0],[795,"FLEXIBLE HOSE 2FT SS 304 (1989)",575.0],[796,"FLEXIBLE HOSE 3FT PVC",330.0],[797,"FLEXIBLE HOSE 4FT PVC",425.0],[798,"FLEXIBLE HOSE 4FT RMR (1884)",1100.0],[799,"FLEXIBLE HOSE 5 FT",520.0],[800,"FLEXIBLE HOSE 5FT RMR (1885)",1200.0],[801,"FLEXIBLE HOSE NICKEL 1 1/2 FT",410.0],[802,"FLEXIBLE HOSE NICKEL 2 FT",425.0],[803,"FLEXIBLE HOSE PVC 1 1/2 FT",240.0],[804,"FLEXIBLE HOSE PVC 2FT GALLAXY (1627)",285.0],[805,"FLEXIBLE HOSE PVC 4 FT GALLAXY [1997]",null],[806,"FLEXIBLE HOSE PVC 5 FT GALLAXY [1968]",null],[807,"FLEXIBLE HOSE PVC 5FT HEAVY NET",650.0],[808,"FLEXIBLE HOSE SS & BLACK 2FT RMR [2217]",460.0],[809,"FLEXIBLE HOSE SS & BLACK 4FT RMR (2574)",590.0],[810,"FLEXIBLE HOSE SS 3FT RMR - HIGH PRESSURE (1942)",530.0],[811,"FLOAT SWITCH 1.5MTR (1054)",985.0],[812,"FLOAT VALVE BRASS 1/2\" CURVE",2150.0],[813,"FLOAT VALVE CURVE 1/2\" BRASS",2150.0],[814,"FLOATING VALVE 1\" - BRASS",1350.0],[815,"FLOATING VALVE 1\" - PVC",1325.0],[816,"FLOATING VALVE 1/2\" - BRASS (1940)",1350.0],[817,"FLOATING VALVE 1/2\" - PVC",775.0],[818,"FLOATING VALVE 3/4\" - PVC",940.0],[819,"FLOATING VALVE SS 2 1/2\"",null],[820,"FLUME WRENCH 4PCS",750.0],[821,"FOAM CLEANING UNIVERSAL SPRAY",775.0],[822,"FOAM SPRAY 750ML AKFIX",1350.0],[823,"FOAM SPRAY DUHENG MAX",1250.0],[824,"FOOT VALVE 1 1/2\"",595.0],[825,"FOOT VALVE 1 1/4\"",null],[826,"FOOT VALVE 1\"",315.0],[827,"FOOT VALVE 1\" LARGE",390.0],[828,"FOUNDATION THREAD",125.0],[829,"FRIDGE GUARD",1950.0],[830,"FULL SEALED RMR SS HEAD SHOWER 6*6",null],[831,"FULL SEALED RMR SS HEAD SHOWER 6*6 (1468)",null],[832,"FUSE WITH TESTER 10PCS",375.0],[833,"GALAXY BIDET SPRAY PVC - IVORY (1559)",575.0],[834,"GALEXY CONSIL VALVE",null],[835,"GALLAXY GLASS SOAP HOLDER",null],[836,"GALLAXY HAND SHOWER 03 - (2390)",null],[837,"GARDEN RACK 10\"",385.0],[838,"GARDEN RACK 12\"",425.0],[839,"GARDEN RACK 14\"",550.0],[840,"GARDEN RACK 8\"",350.0],[841,"GARDEN SCISSOR PURPLE",null],[842,"GARDEN SCISSOR RED HEAVY 22\"",1740.0],[843,"GARDEN SCISSOR RED HEAVY ADJUSTABLE",2100.0],[844,"GARDEN SCISSOR W/H",850.0],[845,"GARDEN SCISSOR YELLOW ADJUSTABLE",1490.0],[846,"GARDEN TAP ABS HEAVY GALLAXY (2510)",220.0],[847,"GARDEN TAP BRASS 1/2\" - RMR",885.0],[848,"GARDEN TAP BRASS 1/2\" - RMR [1366]",850.0],[849,"GARDEN TAP BRASS 3/4\" - RMR",null],[850,"GARDEN TAP PVC GALLAXY (2125)",325.0],[851,"GAS HOSE CLEAR 30MTR",4540.0],[852,"GAS HOSE ORANGE 30MTR - 3 LAYER",5100.0],[853,"GAS REGULATOR AKER L/P",825.0],[854,"GAS REGULATOR EUROGAS H/P - MALAYSIA",2550.0],[855,"GAS REGULATOR EUROGAS L/P - MALAYSIA",1575.0],[856,"GAS REGULATOR H/P MILUX",2200.0],[857,"GAS REGULATOR KIT",1475.0],[858,"GAS REGULATOR L/P MILUX",895.0],[859,"GAS REGULATOR VISION H/P",2650.0],[860,"GAS REGULATOR VISION L/P",1585.0],[861,"GATE HOOKS 2\"",1850.0],[862,"GATE HOOKS 3\"",2900.0],[863,"GATE WHEEL 50mm",null],[864,"GATE WHEEL 50MM - DOUBLE",1250.0],[865,"GATE WHEEL 60MM",null],[866,"GATE WHEEL 60MM - DOUBLE",1500.0],[867,"GATE WHEEL 70MM",null],[868,"GATE WHEEL 70MM - DOUBLE",1490.0],[869,"GATE WHEEL 80MM - Y TYPE",1150.0],[870,"GEL HAMMER P/H - 300G",550.0],[871,"GEL HAMMER P/H - 500G",625.0],[872,"GI CLIP HEAVY 1 1/2\"",32.0],[873,"GI CLIP HEAVY 1 1/4\"",29.0],[874,"GI CLIP HEAVY 1\"",19.0],[875,"GI CLIP HEAVY 1/2\"",11.0],[876,"GI CLIP HEAVY 2\"",34.0],[877,"GI CLIP HEAVY 3/4\"",10.5],[878,"GI MESH 1/2 \u00d7 1/2 - 3FT (30 MTR)",10950.0],[879,"GI U CHANNEL 0.30MM \u00d7 35MM",235.0],[880,"GI U CHANNEL 0.30MM \u00d7 45MM",275.0],[881,"GI U CHANNEL 0.40MM \u00d7 35MM",210.0],[882,"GI U CHANNEL 0.40MM \u00d7 45MM",300.0],[883,"GI WELDED MESH 1 1/2\" \u00d7 1 1/2\"",14900.0],[884,"GLASS & TILE BIT 10MM",395.0],[885,"GLASS & TILE BIT 12MM",440.0],[886,"GLASS & TILE BIT 6MM",295.0],[887,"GLASS & TILE BIT 8MM",320.0],[888,"GLASS & TILE BIT TOOL",null],[889,"GLASS BOWL POP WASTE ROUND (1621)",1275.0],[890,"GLASS BRUSH WITH HOLDER - ROUND",null],[891,"GLASS SHELF CORNER SINGLE WESDA (1737)",null],[892,"GLASS SHELF STEEL 500MM GALLAXY (1392)",1385.0],[893,"GLASS SOAP DISH WITH HOLDER BAG ROUND",null],[894,"GLASS SUCKER - SINGLE",850.0],[895,"GLASS SUCKER - 2 CLAW",1225.0],[896,"GLASS SUCKER - 3 CLAW",1800.0],[897,"GLOVE BLACK",175.0],[898,"GLOVE BLACK & GRAY",null],[899,"GLOVE BLACK COATED NYLON",125.0],[900,"GLOVE BLACK HEAVY",185.0],[901,"GLOVE BLUE HEAVY",155.0],[902,"GLOVE BROWN HEAVY",185.0],[903,"GLOVE DOUBLE DOT",95.0],[904,"GLOVE NYLON BLACK",75.0],[905,"GLOVE NYLON DOT",null],[906,"GLOVE NYLON WHITE",null],[907,"GLOVE ORANGE HEAVY",155.0],[908,"GLOVE ORANGE LUWA HEAVY",165.0],[909,"GLOVE SINGLE DOT",80.0],[910,"GLOVE UVEX",125.0],[911,"GLUE STICK 10MM - LARGE",1800.0],[912,"GLUE STICK 8MM - SMALL",1800.0],[913,"GOOGLES CLEAR",195.0],[914,"GOOGLES HEAVY - BLUE",425.0],[915,"GOOGLES HEAVY - CLEAR",425.0],[916,"GRASS CUTTER BOBBIN HEAD",445.0],[917,"GRASS SLASHER CROCODILE",590.0],[918,"GRASS TRIMMER BLADE 12\"",440.0],[919,"GRASS TRIMMER BLADE 12\" BLACK",440.0],[920,"GRASS TRIMMER BLADE 12\" SILVER TEETH",590.0],[921,"GRASS TRIMMER BLADE 12\" SLIM",430.0],[922,"GRASS TRIMMER BLADE 14\" SILVER",590.0],[923,"GRAY GUM 999 50G",250.0],[924,"GRAY GUM 999 85G",315.0],[925,"GREASE GUN COUPLER HEAVY",650.0],[926,"GREASE GUN COUPLER LIGHT",550.0],[927,"GREASE GUN COUPLER SET",975.0],[928,"GREASE GUN GINMA",2950.0],[929,"GREASE GUN MINI",null],[930,"GREEN MESH",2750.0],[931,"GREEN POWDER 1KG",1490.0],[932,"GREEN ROUND COMMED SEAT COVER S/D HEAVY (1088)",2690.0],[933,"GRIB BAR HANDICAP U MODEL ADJUSTABLE- (2211)",7750.0],[934,"GRIB BAR HANDICAP U MODEL60CM (1694)",5900.0],[935,"GRIB BAR HANDICAP WHITE HEAVY 60CM (1695)",6750.0],[936,"GRINDER KEY 4\"",225.0],[937,"GRINDER NUT 4 1/2\"",200.0],[938,"GRINDER NUT 4\"",185.0],[939,"GRINDING WHEEL 4 1/2\"",155.0],[940,"GRINDING WHEEL 4\"",145.0],[941,"GUIDE BAR SITAI 22\"",6350.0],[942,"GULLY COVER 6*6 POP TYPE",880.0],[943,"GULLY COVER 6*6 SS HEAVY RMR 09 (2340)",2150.0],[944,"GULLY COVER LONG 30CM SS RMR (1497)",1850.0],[945,"GULLY COVER LONG 60CM SS RMR (1228)",3850.0],[946,"GUTTER CHAIN 24FT - COFFEE BROWN",225.0],[947,"GUTTER CHAIN 24FT - GREEN",225.0],[948,"GUTTER CHAIN 24FT - RED",225.0],[949,"HACKSAW BLADE NORMAL",2750.0],[950,"HACKSAW FRAME",550.0],[951,"HACKSAW FRAME BLACK",550.0],[952,"HACKSAW FRAME GREEN HEAVY",950.0],[953,"HACKSAW FRAME POLAND",595.0],[954,"HAIR DRYER GALLAXY (2182)",4750.0],[955,"HAIR TRIMMER (AKS)",3900.0],[956,"HALOGEN BULB 1000W (AKS)",430.0],[957,"HALOGEN BULB 500W (AKS)",390.0],[958,"HAND DRAYER BIG RMR (2374)",18500.0],[959,"HAND MADE MIXER PULL- OUT SINK TAP (1355)",7500.0],[960,"HAND MADE SINK 4 IN 1 OPTION",38000.0],[961,"HAND MADE SINK 50*40 BLACK",null],[962,"HAND MADE SINK 50*40 BLACK RMR (1618)",13900.0],[963,"HAND MADE SINK 50*40 KNIFE BLACK RMR (1483)",13900.0],[964,"HAND MADE SINK 50*40 KNIFE SS RMR (1422)",11500.0],[965,"HAND MADE SINK 50*40 SS",null],[966,"HAND MADE SINK 50*40 SS RMR (1807)",11750.0],[967,"HAND MADE SINK 60*45 BLACK RMR (1619)",14900.0],[968,"HAND MADE SINK 60*45 KNIFE SS RMR (1963)",14000.0],[969,"HAND MADE SINK 60*45 SS RMR (2015)",14000.0],[970,"HAND MADE SINK 78*43 BLACK RMR",18500.0],[971,"HAND MADE SINK 78*43 DOUBLE KNIFE BLACK RMR (2116)",17950.0],[972,"HAND MADE SINK 78*43 KNIFE BLACK DOUBLE RMR (2146)",16500.0],[973,"HAND MADE SINK 78*43 KNIFE SS DOUBLE RMR (1920)",16500.0],[974,"HAND MADE SINK 78*43 SS RMR (1806)",18000.0],[975,"HAND MADE SINK 91*45 BLACK KNIFE RIGHT SIDE RMR (1266)",23500.0],[976,"HAND MADE SINK CUP WASHER",1975.0],[977,"HAND SANDER",350.0],[978,"HAND SAW 18\" P/H",675.0],[979,"HAND SAW 18\" W/H",650.0],[980,"HAND SAW 20\" P/H",725.0],[981,"HAND SAW 20\" W/H",650.0],[982,"HAND SAW CARBON TEETH - SPEAR & JACKSON 18\"",890.0],[983,"HAND SAW CARBON TEETH - SPEAR & JACKSON 20\"",1100.0],[984,"HAND SAW HEAVY 18\" -",990.0],[985,"HAND SAW HEAVY 20\" -",1190.0],[986,"HAND SAW MINI 12\"",295.0],[987,"HAND SAW STAREX 18\"",650.0],[988,"HAND SHOWER CP ROUND BLACK GALLAXY 03 (1855)",1475.0],[989,"HAND SHOWER CP ROUND GALLAXY (2174)",1450.0],[990,"HAND SHOWER CP ROUND GALLAXY (2390)",1450.0],[991,"HAND SHOWER CP ROUND GALLAXY (2391)",1450.0],[992,"HAND SHOWER CP ROUND WHITE GALLAXY 05 (1853)",1475.0],[993,"HAND SHOWER CP SQUARE - 01",1450.0],[994,"HAND SHOWER CP SQUARE BLACK GALLAXY 10 (2172)",1450.0],[995,"HAND SHOWER CP SQUARE WHITE GALLAXY - 08 (2175)",1450.0],[996,"HAND SHOWER CP SQUARE WHITE GALLAXY - 09 (2169)",1450.0],[997,"HAND SHOWER PLASTIC CARD ROUND GALLAXY (1043)",1150.0],[998,"HANDSAW STAREX 20\"",700.0],[999,"HANGING SCALE 100KG PALATHURU",2450.0],[1000,"HARVEST KNIF 21\"",1250.0],[1001,"HARVEST KNIF 33\"",1490.0],[1002,"HARVEST KNIF 49\"",1650.0],[1003,"HASP & STEPLES - 5\"",1500.0],[1004,"HASP & STEPLES - 6\"",1850.0],[1005,"HASP & STEPLES - 2 1/2\"",900.0],[1006,"HASP & STEPLES - 4\"",1260.0],[1007,"HASP & STEPLES 3\"",1100.0],[1008,"HEAD SHOWER ADJUSTABLE BALL ONLY (1456)",185.0],[1009,"HEAD SHOWER BLACK 8*8 WITH ARM RMR (2450)",1950.0],[1010,"HEAD SHOWER SS 4*4 WITH ARM RMR (1231)",null],[1011,"HEAD SHOWER SS 6*6 WITH ARM",1450.0],[1012,"HEAD SHOWER SS 6*6 WITH ARM RMR (1234)",1485.0],[1013,"HEAD SHOWER SS 8*8 WITH ARM RMR (1236)",2150.0],[1014,"HEATER HEAD SHOWER - 14 (2352)",6490.0],[1015,"HEATER HEAD SHOWER - 15 (2353)",6850.0],[1016,"HEX NUT 16MM",650.0],[1017,"HEX NUT 1/2\"",690.0],[1018,"HEX NUT 12MM",null],[1019,"HEX NUT 3/4\"",675.0],[1020,"HEX NUT 3/8\"",695.0],[1021,"HEX NUT 5/16",565.0],[1022,"HEX NUT 5/8\"",690.0],[1023,"HIGH BRANCH SAW TREE LOPPER",1950.0],[1024,"HIGH POWER BEDSIDE SWITCH AKKO STAR",140.0],[1025,"HIGH PRESSURE PUMP RMR (1929)",5950.0],[1026,"HIGH SPEED DRILL BIT - 5/32",115.0],[1027,"HIGH SPEED DRILL BIT LGW - 5/32",null],[1028,"HIGH SPEED HACK SAW BLADE",170.0],[1029,"HILTY CLIP 1 1/2\"",null],[1030,"HILTY CLIP 1\"",null],[1031,"HILTY CLIP 2\"",null],[1032,"HILTY CLIP 4\"",null],[1033,"HILTY EPOXY GUM",3250.0],[1034,"HILTY GUN",3750.0],[1035,"HINGES SGL 4*2 1/2",640.0],[1036,"HINGES SGL 4*3\"",1050.0],[1037,"HINGES SGL 5*3\"",1490.0],[1038,"HINGES SS 4*2 1/2",640.0],[1039,"HINGES SS 5*3",1490.0],[1040,"HOLDER 2 IN 1 WHITE",122.0],[1041,"HOLDER BLACK",540.0],[1042,"HOLDER SCREW TYPE HVY",100.0],[1043,"HOLDER SCREW TYPE NCH HVY",100.0],[1044,"HOLDER SGI WHITE",null],[1045,"HOLDER WHITE",68.0],[1046,"HOLE SAW SET 11 PCS",925.0],[1047,"HOLE SAW TCT 16MM",650.0],[1048,"HOLE SAW TCT 19MM",700.0],[1049,"HOLE SAW TCT 20MM",750.0],[1050,"HOLE SAW TCT 22MM",800.0],[1051,"HOLE SAW TCT 24MM",850.0],[1052,"HOLE SAW TCT 25MM",900.0],[1053,"HOLE SAW TCT 45MM",1350.0],[1054,"HOODA BIDET SPRAY PVC WHITE (1376)",570.0],[1055,"HOODA BIDET SPRAY ZINC - ROUND",2575.0],[1056,"HOODA BIDET SPRAY ZINC SQUARE SML",2390.0],[1057,"HOSE CLIP 1 1/2\"",53.0],[1058,"HOSE CLIP 1 1/4\"",25.0],[1059,"HOSE CLIP 1\"",22.0],[1060,"HOSE CLIP 1/2\"",11.0],[1061,"HOSE CLIP 2 1/2\"",53.0],[1062,"HOSE CLIP 2\"",48.0],[1063,"HOSE CLIP 3\"",55.0],[1064,"HOSE CLIP 3/4\"",18.0],[1065,"HOSE CLIP 4\"",70.0],[1066,"HOSE CLIP 5/8\"",15.0],[1067,"HOSE JOINT 1/2\"",15.0],[1068,"HOSE NOZZLE 7 WAY",395.0],[1069,"HOSE NOZZLE BRASS",385.0],[1070,"HOSE NOZZLE BULLET",125.0],[1071,"HOSE NOZZLE SINGLE",null],[1072,"HSS DRILL BIT 5/32\"",135.0],[1073,"INDICATOR LIGHT AKKO STAR",115.0],[1074,"INSULATION TAPE AKKO STAR",95.0],[1075,"INSULATION TAPE BLACK (AKS)",98.0],[1076,"INSULATION TAPE H/P BLACK",65.0],[1077,"INSULATION TAPE H/P BLUE",65.0],[1078,"INSULATION TAPE H/P GRAY",65.0],[1079,"INSULATION TAPE H/P GREEN",65.0],[1080,"INSULATION TAPE H/P RED",65.0],[1081,"INSULATION TAPE H/P WHITE",65.0],[1082,"INSULATION TAPE H/P YELLOW",65.0],[1083,"INSULATION TAPE HIGH POWER A/F",100.0],[1084,"INVOICE",null],[1085,"INVOICE -",null],[1086,"INVOICE - 0000000174",null],[1087,"INVOICE - 0000000247",null],[1088,"INVOICE - 0000000250",null],[1089,"INVOICE - 0000000272",null],[1090,"INVOICE - 035",null],[1091,"INVOICE - 036",null],[1092,"INVOICE - 037",null],[1093,"INVOICE - 1166/25-26",null],[1094,"INVOICE - 21/00693",null],[1095,"INVOICE - 2610",null],[1096,"INVOICE - 76137",null],[1097,"INVOICE - 76138",null],[1098,"INVOICE - 76811",null],[1099,"INVOICE - 76812",null],[1100,"INVOICE - 76813",null],[1101,"INVOICE - 76814",null],[1102,"INVOICE - 77145",null],[1103,"INVOICE - 77146",null],[1104,"INVOICE - 77633",null],[1105,"INVOICE - 77636",null],[1106,"INVOICE - A5077",null],[1107,"INVOICE - AS8313",null],[1108,"INVOICE - C31311",null],[1109,"INVOICE - C55877",null],[1110,"INVOICE - IMP-260578",null],[1111,"INVOICE - NAS-260345",null],[1112,"INVOICE - NAS-260347",null],[1113,"INVOICE - NAS-260348",null],[1114,"INVOICE - NAS-260424",null],[1115,"INVOICE - NAS-260445",null],[1116,"INVOICE - NAS-260446",null],[1117,"INVOICE - NAS-260478",null],[1118,"INVOICE -77073",null],[1119,"INVOICE 054",null],[1120,"INVOICE 058",null],[1121,"INVOICE 1165/25-26",null],[1122,"INVOICE 21/00305",null],[1123,"INVOICE 21/01188",null],[1124,"INVOICE 23-7222",null],[1125,"INVOICE 77074",null],[1126,"ISO FLAT WASHER 12\u00d735",625.0],[1127,"IVORY ROUND COMMED SEAT COVER S/D HEAVY",2690.0],[1128,"JAGUAR NAIL 1\"",695.0],[1129,"JAGUAR NAIL 3/4\"",695.0],[1130,"JIG SAW BLADE T118",275.0],[1131,"JIG SAW BLADE T144D",275.0],[1132,"JIG SAW BLADE T244D",275.0],[1133,"JK FILE 3 1/2\"",1320.0],[1134,"JK FILE 3\"",1260.0],[1135,"JK FILE 3\" - SLIM",1260.0],[1136,"JK FILE 4\"",1380.0],[1137,"JK FILE 5\"",2340.0],[1138,"JK FILE 6\"",2340.0],[1139,"JOINT TAPE - 20MTR",245.0],[1140,"JOINT TAPE - 45MTR",385.0],[1141,"JOINT TAPE - 50MTR",445.0],[1142,"JOINT TAPE - 90MTR",695.0],[1143,"JUMPER CABLE 800AM",1450.0],[1144,"JUMPER CABLE 1000 AMP",2850.0],[1145,"KEY SET",null],[1146,"KITCHEN SCALE 5KG",null],[1147,"KITCHEN SCALE 7KG",850.0],[1148,"KITCHEN SINK TAP GALLAXY (1171)",2350.0],[1149,"L BEND 4\"",915.0],[1150,"L HANDLE 10\"",550.0],[1151,"L HANDLE 12\"",545.0],[1152,"L HANDLE SET 02PCS",1225.0],[1153,"L HANDLE SET 04PCS",1650.0],[1154,"LAMBA - CENTER",925.0],[1155,"LAMBA 1 1/2\"",950.0],[1156,"LAMBA 1\"",875.0],[1157,"LAMBA 3/4\"",825.0],[1158,"LAWN MOVER RECHARGEABLE",6950.0],[1159,"LEAF RAKE METAL",null],[1160,"LED BULB 1W PACKET",58.0],[1161,"LED BULB C37 AKKO STAR",285.0],[1162,"LED EMERGENCY BULB 15W (AKS)",2100.0],[1163,"LED FLOODLIGHT 25W AKKO STAR",1450.0],[1164,"LED FLOODLIGHT 35W AKKO STAR",1800.0],[1165,"LED FLOODLIGHT 70W AKKO STAR",2650.0],[1166,"LED GLASS PANEL LIGHT 3W AKKO STAR",750.0],[1167,"LED HEADLAMP AKKO STAR",2350.0],[1168,"LED LIGHT SET 100L MULTY",425.0],[1169,"LED LIGHT SET 28 LIGHTS",585.0],[1170,"LED MIRROR 70*50 - (D08 & D09)",7750.0],[1171,"LED MIRROR 70*50 - (D15 & D13)",7500.0],[1172,"LED MIRROR 70\u00d750 - (D13)",7200.0],[1173,"LED MIRROR 70\u00d750 - (D16)",7200.0],[1174,"LED MIRROR 80*60 - AS",14300.0],[1175,"LED RECHARGEABLE KEYCHAIN LIGHT (AKS)",1290.0],[1176,"LED SENSOR MIRROR - D09 & D13 (2323)",8600.0],[1177,"LED SENSOR MIRROR - D16 & D15",8500.0],[1178,"LED SENSOR MIRROR 70 \u00d7 50 - (D09)",9190.0],[1179,"LED SENSOR MIRROR 70 \u00d7 50 - (D13)",8550.0],[1180,"LED SENSOR MIRROR 70 \u00d7 50 - (D15)",9460.0],[1181,"LED SENSOR MIRROR 70 \u00d7 50 - (D16)",8550.0],[1182,"LED SENSOR MIRROR 70*50 - D16 & D15",8500.0],[1183,"LED SLIM PANEL LIGHT 7W AKKO STAR",390.0],[1184,"LED T BULB 30W AKKO STAR",975.0],[1185,"LED T BULB 40W AKKO STAR",1250.0],[1186,"LED T BULB 50W AKKO STAR",1375.0],[1187,"LED TOUCH MIRROR 60 \u00d7 60 - 03",7500.0],[1188,"LED TOUCH MIRROR 70 \u00d7 50 - (2322)",7500.0],[1189,"LED TOUCH MIRROR 70 \u00d7 50 - 03",7750.0],[1190,"LED TOUCH MIRROR 70 \u00d7 50 - D08",7500.0],[1191,"LED TOUCH MIRROR 70*50 - (1074)",8100.0],[1192,"LED TOUCH MIRROR 70*50 - (1075)",7850.0],[1193,"LED TOUCH MIRROR 70*50 - (2101)",8100.0],[1194,"LED TOUCH MIRROR 70*50 - (2294)",8100.0],[1195,"LED TOUCH MIRROR 70*50 - (2319)",8750.0],[1196,"LED TOUCH MIRROR 70*50 - 1097 & 1048 (2322)",8100.0],[1197,"LED TOUCH MIRROR 70*50 - D15 & D16 (2319)",8100.0],[1198,"LED TOUCH MIRROR 70*50 GOLD FRAME L1089 (2629)",9750.0],[1199,"LED TOUCH MIRROR 70*50 L1064 (2294)",8750.0],[1200,"LED TOUCH MIRROR 70*50 L1076 (2101)",8750.0],[1201,"LED TOUCH MIRROR 70*50 SILVER FRAME L1037 (2632)",9500.0],[1202,"LEVEL 18",null],[1203,"LINK CHAIN 1/4\"",675.0],[1204,"LINK CHAIN 3/16",700.0],[1205,"LITHIUM BATTERY HEADLAMP-PLASTIC AKKO STAR",1150.0],[1206,"LIVER TAP HANDLE ONLY (2269)",550.0],[1207,"LOCK CYLINDER 60MM",690.0],[1208,"LOCK CYLINDER 70MM",790.0],[1209,"LOCK CYLINDER ALPHA LOCK",650.0],[1210,"LOCK CYLINDER LARGE",890.0],[1211,"LOCK CYLINDER LINCY - 60MM \u00d7 30MM",690.0],[1212,"LOCK CYLINDER LINCY - 70MM \u00d7 28MM",690.0],[1213,"LOCK CYLINDER LINCY - 70MM \u00d7 30MM",690.0],[1214,"LOCK CYLINDER PLUTO 5 KEY",2400.0],[1215,"LONG NOSE PLAIR 8\" - CARD",425.0],[1216,"LONG NOSE PLAIR 8\" - RED GRIP",645.0],[1217,"LONG NOSE PLAIR 8\" ORANGE GRIP",695.0],[1218,"LOW LEVEL CISTERN TANK UNIFLO",null],[1219,"LUXURY COMMED SEAT COVER (1021)",null],[1220,"M SEAL BLUE 25G",110.0],[1221,"M SEAL RED 40G",165.0],[1222,"M SEAL RED 60G",210.0],[1223,"MAGIC BEND BOX HEAVY 4\" (1169)",1350.0],[1224,"MAGIC BEND GRAY 4\"",750.0],[1225,"MAGIC BEND WHITE 4\"",665.0],[1226,"MAGIC HOSE 1 1/4\"",130.0],[1227,"MAGIC HOSE 1 1/2\"",145.0],[1228,"MAGIC HOSE 2 IN 1 GRAY",275.0],[1229,"MAGIC HOSE WITH WAST - GRAY",1100.0],[1230,"MAGNET NORMAL LARGE",55.0],[1231,"MAGNET NORMAL MEDIUM",95.0],[1232,"MAGNET NORMAL SMALL",35.0],[1233,"MAGNET SS LARGE",140.0],[1234,"MAGNET SS MEDIUM",95.0],[1235,"MAIN TEE - BLACK LINE",395.0],[1236,"MAIN TEE - WHITE LINE",395.0],[1237,"MAIN TEE TEAK",425.0],[1238,"MALLET DOUBLE HEAD",610.0],[1239,"MARBLE BIT 16MM",null],[1240,"MARBLE BIT 18MM",null],[1241,"MASKING TAPE 1\" (20M)",95.0],[1242,"MASKING TAPE 2\" (20M)",190.0],[1243,"MASKING TAPE JUMBO 1\" - GREEN",275.0],[1244,"MASKING TAPE JUMBO 1\" HIGH POWER",180.0],[1245,"MASKING TAPE JUMBO 2\" - GREEN",495.0],[1246,"MASKING TAPE JUMBO 2\" HIGH POWER",495.0],[1247,"MASON TROWEL 7\" F/H",460.0],[1248,"MAT FOIL 3MM \u00d7 100M - SINGLE SIDE",18275.0],[1249,"MAT FOIL 5MM - DOUBLE SIDE",15000.0],[1250,"MEASURING TAPE 10MTR -",690.0],[1251,"MEASURING TAPE 10MTR FIBER",585.0],[1252,"MEASURING TAPE 15MTR -",720.0],[1253,"MEASURING TAPE 15MTR FIBER",625.0],[1254,"MEASURING TAPE 20MTR -",840.0],[1255,"MEASURING TAPE 20MTR FIBER",710.0],[1256,"MEASURING TAPE 30MTR -",930.0],[1257,"MEASURING TAPE 30MTR FIBER",850.0],[1258,"MEASURING TAPE 50MTR FIBER",1370.0],[1259,"MEMMOTTY FORK 03 WAY",1390.0],[1260,"METAL TORCH MULTI FUNCTION 15W BLACK (AKS)",4390.0],[1261,"MICRO MULTI SOCKET 13AM",825.0],[1262,"MICRO MULTI SOCKET SMALL",825.0],[1263,"MICRO MULTI SOCKET WITH USB 13AM (AKS",1450.0],[1264,"MINI FILE SET - 05 PCS",null],[1265,"MINI FILE SET - 06 PCS",null],[1266,"MINI FILE SET - 10 PCS",null],[1267,"MIRROR LED TOUCH 70*50 FRAME (2521)",8900.0],[1268,"MIRROR LED TOUCH 70*50 FRAME (2523)",8900.0],[1269,"MIRROR LED TOUCH ROUND AS(3584)",9500.0],[1270,"MIXER SHOWER HEAD ONLY RMR - (2410)",13500.0],[1271,"MIXER TAP NUT",null],[1272,"MIXER TAP WASHER SET",295.0],[1273,"MOMMOTTY FORK 04 WAY",1590.0],[1274,"MORTISE LOCK SUMO (699) THAILAND",1895.0],[1275,"MORTISE LOCK SUMO 696",1750.0],[1276,"MORTISE LOCK UNION",4750.0],[1277,"MORTISE LOCK VISION (THAILAND)",1890.0],[1278,"MOSQITO MESH BLACK 1M\u00d725M",8750.0],[1279,"MOSQITO MESH BLUE 1M\u00d725M",7750.0],[1280,"MOSQITO MESH BROWN 1M\u00d725M",8750.0],[1281,"MOSQITO MESH GREEN 1M\u00d725M",8450.0],[1282,"MOSQUITO MESH BLACK - 25MTR",8500.0],[1283,"MOSQUITO MESH BROWN - 25MTR",8750.0],[1284,"MOSQUITO MESH GREEN - 25MTR",8750.0],[1285,"MOSQUITO RACKET (AKS)",1850.0],[1286,"MOSQUITO RACKET STAND TYPE (AKS)",2150.0],[1287,"MOUNT STONE 10 PCS",650.0],[1288,"MULTI ANGLE RULER",1490.0],[1289,"MULTI FUNCTION LADDER 12FT",23500.0],[1290,"MULTI HAND AXE 12\"",600.0],[1291,"MULTI SOCKET 13AM D&B",1650.0],[1292,"MULTI SOCKET 3 GANG (AKS)",1475.0],[1293,"MULTI SOCKET SMALL D&B",1650.0],[1294,"MULTI SOCKET SMALL INDIA",310.0],[1295,"MULTIMETER AKKO STAR",2425.0],[1296,"MULTY 2 FUNCTION LED SINK RMR (2117)",32000.0],[1297,"NAIL GUN - NAIL",1480.0],[1298,"NAIL GUN WITH PACK",2090.0],[1299,"NEEDLE FILE SET",null],[1300,"NIGHT LATCH HANDLE - BP",195.0],[1301,"NIGHT LATCH HANDLE - BRASS",315.0],[1302,"NIGHT LATCH HANDLE - COPPER",240.0],[1303,"NIGHT LATCH THAILAND - NO.1",1700.0],[1304,"NO LEAK TAPE 2\" - 10MTR",890.0],[1305,"NO LEAK TAPE 3\" - 10MTR",1215.0],[1306,"NO LEAK TAPE 4\" - 10MTR",1690.0],[1307,"NON RETURN VALVE 1/2\" BRASS (1005)",890.0],[1308,"NON RETURN VALVE BRASS 1 1/2\"",3250.0],[1309,"NON RETURN VALVE BRASS 1\"",1740.0],[1310,"NON RETURN VALVE BRASS 2\"",3500.0],[1311,"NOSE PLAIR 8\" - HEAVY",890.0],[1312,"NOSING PAD 4\" - 100",390.0],[1313,"NOSING PAD 4\" - 1000",395.0],[1314,"NOSING PAD 4\" - 150",390.0],[1315,"NOSING PAD 4\" - 1500",395.0],[1316,"NOSING PAD 4\" - 200",390.0],[1317,"NOSING PAD 4\" - 2000",395.0],[1318,"NOSING PAD 4\" - 2500",395.0],[1319,"NOSING PAD 4\" - 300",390.0],[1320,"NOSING PAD 4\" - 3000",395.0],[1321,"NOSING PAD 4\" - 400",390.0],[1322,"NOSING PAD 4\" - 50",390.0],[1323,"NOSING PAD 4\" - 800",395.0],[1324,"NOSING WHEEL TILE & GRANITE 4\"",450.0],[1325,"NUT & BOLT 05 \u00d7 50MM",650.0],[1326,"NUT & BOLT 06 \u00d7 40MM",575.0],[1327,"NUT & BOLT 08 \u00d7 175MM",675.0],[1328,"NUT & BOLT 10 \u00d7 150MM",575.0],[1329,"NUT & BOLT 10 \u00d7 175MM",585.0],[1330,"NUT & BOLT 10 \u00d7 200MM",585.0],[1331,"NUT & BOLT 12 \u00d7 200MM",625.0],[1332,"NUT & BOLT 16 \u00d7 200MM",625.0],[1333,"NUT & BOLT 05 \u00d7 25MM",595.0],[1334,"NUT & BOLT 05 \u00d7 40MM",675.0],[1335,"NUT & BOLT 05 \u00d7 60MM",585.0],[1336,"NUT & BOLT 06 \u00d7 100MM",650.0],[1337,"NUT & BOLT 06 \u00d7 16MM",685.0],[1338,"NUT & BOLT 06 \u00d7 200MM",650.0],[1339,"NUT & BOLT 06 \u00d7 20MM",595.0],[1340,"NUT & BOLT 06 \u00d7 25MM",650.0],[1341,"NUT & BOLT 06 \u00d7 30MM",595.0],[1342,"NUT & BOLT 06 \u00d7 35MM",685.0],[1343,"NUT & BOLT 06 \u00d7 50MM",595.0],[1344,"NUT & BOLT 06 \u00d7 60MM",650.0],[1345,"NUT & BOLT 06 \u00d7 75MM",650.0],[1346,"NUT & BOLT 08 \u00d7 200MM",585.0],[1347,"NUT & BOLT 08 \u00d7 20MM",650.0],[1348,"NUT & BOLT 08 \u00d7 30MM",650.0],[1349,"NUT & BOLT 08 \u00d7 35MM",685.0],[1350,"NUT & BOLT 10 \u00d7 100MM",585.0],[1351,"NUT & BOLT 10 \u00d7 20MM",595.0],[1352,"NUT & BOLT 10 \u00d7 30MM",585.0],[1353,"NUT & BOLT 10 \u00d7 50MM",610.0],[1354,"NUT & BOLT 12 \u00d7 100MM",650.0],[1355,"NUT & BOLT 12 \u00d7 150MM",650.0],[1356,"NUT & BOLT 12 \u00d7 50MM",null],[1357,"NUT & BOLT 12 \u00d7 75MM",585.0],[1358,"NUT & BOLT 14 \u00d7 50MM",null],[1359,"NUT & BOLT 16 \u00d7 100MM",585.0],[1360,"NUT & BOLT 16 \u00d7 150MM",585.0],[1361,"NUT & BOLT 16 \u00d7 50MM",595.0],[1362,"NUT & BOLT 16 \u00d7 75MM",595.0],[1363,"NUT & BOLT 05 \u00d7 35MM",675.0],[1364,"NUT & BOLT 05\u00d7100MM",700.0],[1365,"NUT & BOLT 08 \u00d7 100MM",650.0],[1366,"NUT & BOLT 08 \u00d7 125MM",675.0],[1367,"NUT & BOLT 08 \u00d7 150MM",675.0],[1368,"NUT & BOLT 08 \u00d7 25MM",595.0],[1369,"NUT & BOLT 08 \u00d7 40MM",650.0],[1370,"NUT & BOLT 08 \u00d7 50MM",650.0],[1371,"NUT & BOLT 08 \u00d7 60MM",650.0],[1372,"NUT & BOLT 08 \u00d7 75MM",650.0],[1373,"NUT & BOLT 10 \u00d7 125MM",650.0],[1374,"NUT & BOLT 10 \u00d7 25MM",585.0],[1375,"NUT & BOLT 10 \u00d7 35MM",650.0],[1376,"NUT & BOLT 10 \u00d7 40MM",595.0],[1377,"NUT & BOLT 10 \u00d7 60MM",585.0],[1378,"NUT & BOLT 10 \u00d7 75MM",595.0],[1379,"NUT & BOLT 10 \u00d7100MM",650.0],[1380,"NUT & BOLT 12 \u00d7 125MM",675.0],[1381,"NUT & BOLT 12 \u00d7 60MM",650.0],[1382,"NUT & BOLT 16 \u00d7 125MM",585.0],[1383,"NUT 06MM",575.0],[1384,"NUT 10 MM",680.0],[1385,"NUT 12 MM",625.0],[1386,"NUT 8 MM",825.0],[1387,"NUT PAD 4 ''",50.0],[1388,"NUT PAD 4 1/2\"",65.0],[1389,"NUT PAD HEAVY WHITE - 4 1/2\"",370.0],[1390,"NUT PAD HEAVY WHITE - 4\"",320.0],[1391,"NYLON TWINE HEAVY",null],[1392,"OIL BARREL CONDENSER 2.5UF (INTECH)",165.0],[1393,"OIL CAN CLEAR - 300 CC",525.0],[1394,"OIL CAN CLEAR - 350 CC",550.0],[1395,"OIL CAN STEEL - 300 CC",595.0],[1396,"OIL CAN STEEL - 500 CC",690.0],[1397,"OIL FILTER WRENCH - BELT",725.0],[1398,"OIL FILTER WRENCH - CHAIN",725.0],[1399,"Old Balanced",16600.0],[1400,"ONE UNIT COMMED BLACK RMR (2441)",52500.0],[1401,"ONE UNIT COMMED TILE DIAMOND RMR (2419)",46500.0],[1402,"ONE UNIT COMMED WHITE (AS124)",null],[1403,"PACKING TAPE 1\" 20M",85.0],[1404,"PACKING TAPE 1\" JUMBO",195.0],[1405,"PACKING TAPE 2\" JUMBO",295.0],[1406,"PACKING TAPE 2\" JUMBO 200MTR",690.0],[1407,"PACKING TAPE 2\" JUMBO BROWN",345.0],[1408,"PACKING TAPE 2\" \u00d7 25M",125.0],[1409,"PACKING TAPE 2\" \u00d7 30M",125.0],[1410,"PACKING TAPE 2\" \u00d7 45M",175.0],[1411,"PAD BOLT 6\" HEAVY",890.0],[1412,"PAD LOCK 2 1/2\" - GLOBE",2175.0],[1413,"PAD LOCK 2\" - GLOBE",1485.0],[1414,"PAD LOCK 60MM SQ GILD CITY",null],[1415,"PAD LOCK CARD - LARGE",2150.0],[1416,"PAD LOCK CARD - SMALL",1525.0],[1417,"PAD LOCK LONG 1 1/2\"",390.0],[1418,"PAD LOCK LONG 2\"",525.0],[1419,"PAINT BRUSH 4''",null],[1420,"PAINT TRAY PVC",215.0],[1421,"PANNEL PIN 1 \u00d7 19",645.0],[1422,"PANNEL PIN 1 \u00d717",645.0],[1423,"PANNEL PIN 3/4 \u00d717",645.0],[1424,"PANNEL PIN 3/4 \u00d7 19",695.0],[1425,"PANTRY HINGES - HYDRAULIC",295.0],[1426,"PANTRY HINGES - NORMAL",195.0],[1427,"PAPER CUTTER HEAVY JINPING",250.0],[1428,"PAPER CUTTER",395.0],[1429,"PAPER CUTTER 12 PCS SET",350.0],[1430,"PAPER CUTTER BLACK HEAVY",420.0],[1431,"PAPER CUTTER BLADE",12.0],[1432,"PAPER CUTTER BLADE BLACK HEAVY",35.0],[1433,"PAPER CUTTER HEAVY A+",225.0],[1434,"PAPER CUTTER NORMAL HEAVY",null],[1435,"PAPER CUTTER POSITIVE",190.0],[1436,"PAPER HOLDER - NORMAL (1083)",475.0],[1437,"PAYMENT RECEIVED",null],[1438,"PENDANT CERAMIC HOLDER (AKS)",140.0],[1439,"PENDENT HOLDER WHITE",104.0],[1440,"PET CHOKER SINGLE LARGE",300.0],[1441,"PET CHOKER SINGLE SMALL",235.0],[1442,"PHOTO ELECTRIC STREET LIGHTING CONTROL 6A AKKO STAR",715.0],[1443,"PIANO SHOWER 06",null],[1444,"PIANO SHOWER 07",null],[1445,"PIANO SHOWER SET BLACK AS316",17500.0],[1446,"PIANO SHOWER SET HEAVY (2514)",34500.0],[1447,"PINK ROUND COMMED SEAT COVER S/D HEAVY (1092)",2690.0],[1448,"PIPE WRENCH HEAVY 14\"",1790.0],[1449,"PIPE WRENCH HEAVY 18\"",2190.0],[1450,"PIPE WRENCH HEAVY DUTY 12\"",1550.0],[1451,"PLAIN MIRROR 60*45 5MM (2100)",2250.0],[1452,"PLAIN MIRROR 60*45 4MM (1084)",2100.0],[1453,"PLAIN MIRROR 60*45 5MM",null],[1454,"PLAIN MIRROR 70*50 4MM (1563)",2450.0],[1455,"PLAIN MIRROR 70*50 5MM (1732)",null],[1456,"PLAIN MIRROR 80*60 4MM (1564)",2850.0],[1457,"PLAIN MIRROR 80*60 5MM (1070)",null],[1458,"PLAIR COMBINATION 8\" CARD",450.0],[1459,"PLAIR COMBINATION ORANGE 8\"",650.0],[1460,"PLANER BLADE 10\" -TRAIN",2850.0],[1461,"PLANER BLADE 12\" - TRAIN",3150.0],[1462,"PLASTIC MIRROR SET (1291)",2950.0],[1463,"PLASTIC RUNNERS (1000 PCS)",null],[1464,"PLASTIC TOOL BOX 7 IN 1",11500.0],[1465,"PLUG BASE - UNIVERSAL",390.0],[1466,"PLUG BASE COSMO 15AM",490.0],[1467,"PLUG TOP 13A (AKS)",345.0],[1468,"PLUG TOP 13AM",210.0],[1469,"PLUG TOP LARGE",245.0],[1470,"PLUG TOP LARGE (AKS)",435.0],[1471,"PLUG TOP LARGE INDIA",400.0],[1472,"PLUG TOP LARGE ROCKER",450.0],[1473,"PLUG TOP SMALL",145.0],[1474,"PLUG TOP SMALL HEAVY INDIA",170.0],[1475,"PLUMBER ANGLE VALVE BLACK & GOLD (ETL 0506)",2850.0],[1476,"PLUMBER BASIN TAP BLACK & GOLD (ETL 0101)",6290.0],[1477,"PLUMBER BIDET SPRAY FRESCA METAL HOSE",7820.0],[1478,"PLUMBER BIDET SPRAY PVC HOSE",2890.0],[1479,"PLUMBER BIDET SPRAY PVC METAL HOSE",3785.0],[1480,"PLUMBER BIP TAP BLACK & GOLD (ETL 0202)",6165.0],[1481,"PLUMBER BLACK & GOLD CONCEALED VALVE 15MM",7865.0],[1482,"PLUMBER BLACK & GOLD MINI ANGLE VALVE",2850.0],[1483,"PLUMBER CONSILE VALVE 1/2\" - NECTAR",5825.0],[1484,"PLUMBER CONSILE VALVE 3/4\" - NECTAR",6700.0],[1485,"PLUMBER CROSS BASIN TAP",7270.0],[1486,"PLUMBER CROSS BIP TAP",5400.0],[1487,"PLUMBER CROSS CONCEALED VALVE 15MM",4975.0],[1488,"PLUMBER CROSS CONCEALED VALVE 20MM",5440.0],[1489,"PLUMBER CROSS SINK TAP",7650.0],[1490,"PLUMBER FLEXIBLE HOSE 18\"",720.0],[1491,"PLUMBER FLEXIBLE HOSE 24\"",880.0],[1492,"PLUMBER HAND SHOWER SQUARE METAL HOSE",5610.0],[1493,"PLUMBER NECTA CONSILE VALVE 1/2\"",null],[1494,"PLUMBER NECTA CONSILE VALVE 3/4\"",null],[1495,"PLUMBER NECTAR ANGLE VALVE",3230.0],[1496,"PLUMBER NECTAR BASIN TAP LONG NOSE",5655.0],[1497,"PLUMBER NECTAR BIP TAP",5015.0],[1498,"PLUMBER NECTAR BIP TAP (0202)",5015.0],[1499,"PLUMBER NECTAR CONCEALED VALVE 15MM (0405)",5695.0],[1500,"PLUMBER NECTAR SINK TAP",7055.0],[1501,"PLUMBER OVER HEAD SHOWER 3\" ROUND",2635.0],[1502,"PLUMBER SOAP TRAY",4210.0],[1503,"PLUMBER SQUARE ANGLE VALVE",3615.0],[1504,"PLUMBER SQUARE BASIN TAP (1101)",6545.0],[1505,"PLUMBER SQUARE BIP TAP",5440.0],[1506,"PLUMBER SQUARE CONCEALED VALVE 15MM",5950.0],[1507,"PLUMBER SQUARE CONCEALED VALVE 20MM",6210.0],[1508,"PLUMBER SQUARE SINK TAP",8670.0],[1509,"PLUMBER TOWEL BAR 24\"",5440.0],[1510,"PLUMBER TUMBLER HOLDER",4675.0],[1511,"PLUMBER WASTE CUPLING 1 1/4\"",1700.0],[1512,"PLUNGER - RED HEAVY",490.0],[1513,"PLUNGER SMALL HEAVY",350.0],[1514,"POCKET BALANCE - STEEL",620.0],[1515,"POCKET BALANCE 100KG - PVC",1275.0],[1516,"POCKET BALANCE 50KG - PVC",830.0],[1517,"POCKET BALANCE STEEL 50KG",590.0],[1518,"POLICE DOG BELT",390.0],[1519,"POLICE DOG BELT LARGE",390.0],[1520,"POLISHING PAD 4 1/2\"",275.0],[1521,"POLISHING PAD 4\"",250.0],[1522,"POLISHING PAD 7\"",445.0],[1523,"POLO GULLY COVER 6*6 (1194)",310.0],[1524,"POP GULLY COVER 6*6 (1019)",850.0],[1525,"POP RIVERT - 1/8 \u00d7 1/2",1450.0],[1526,"POP RIVERT - 1/8 \u00d7 3/8",1550.0],[1527,"POP RIVERT - 1/8 \u00d7 5/8",1550.0],[1528,"POP RIVERT - 1/8 \u00d7 5/8 (1000)",null],[1529,"POP RIVERT - 5/32 \u00d7 1",1490.0],[1530,"POP RIVERT - 5/32 \u00d7 1/2",1600.0],[1531,"POP RIVERT - 5/32 \u00d7 1/2 (1000)",1595.0],[1532,"POP RIVERT - 5/32 \u00d7 1/2 (500)",1595.0],[1533,"POP RIVERT - 5/32 \u00d7 3/4",1400.0],[1534,"POP RIVERT - 5/32 \u00d7 3/4 (500)",null],[1535,"POP RIVERT - 5/32 \u00d7 3/8",867.0],[1536,"POP RIVERT - 5/32 \u00d7 5/8",1225.0],[1537,"POP RIVERT - 5/32 \u00d7 5/8 (500)",null],[1538,"POP RIVERT - 3/16 \u00d7 1",3150.0],[1539,"POP RIVERT - 3/16 \u00d7 1 (250)",1100.0],[1540,"POP RIVERT - 3/16 \u00d7 1/2",1525.0],[1541,"POP RIVERT - 3/16 \u00d7 3/4",1750.0],[1542,"POP RIVERT - 3/16 \u00d7 3/8",1525.0],[1543,"POP RIVERT GUN",825.0],[1544,"POP RIVERT GUN - GINMA",1100.0],[1545,"POP RIVERT GUN A+",900.0],[1546,"POP RIVERT GUN SRC",850.0],[1547,"POP WAST UMBRELLA CP GALLAXY (1593)",650.0],[1548,"POP WASTE 1 1/4\" PVC GALLAXY (1888)",390.0],[1549,"POP WASTE SQUARE HEAD GLASS BOWL RMR (1057)",2150.0],[1550,"PRECISION KNIFE SET 13PCS",625.0],[1551,"PRESSURE PUMP WITH UNIT (2453)",16500.0],[1552,"PRINT COST",null],[1553,"PRUNING SAW BLACK HEAVY",1150.0],[1554,"PRUNING SAW RED",875.0],[1555,"PRUNING SAW SILVER",875.0],[1556,"PRUNING SAW SILVER - TESEN",875.0],[1557,"PRUNING SAW SMALL",315.0],[1558,"PRUNING SHEAR 8\" HEAVY",null],[1559,"PRUNING SHEAR HEAVY RUIYI",775.0],[1560,"PUTTY MIXER SMALL",515.0],[1561,"PUTTY MIXER LARGE",675.0],[1562,"PUTTY MIXER MEDIUM",580.0],[1563,"PVC ANGEL VALVE BLACK HEAD",null],[1564,"PVC BALL VALVE HEAVY 1 1/4\" - FORCE",225.0],[1565,"PVC BALL VALVE HEAVY 2\" - FORCE",1450.0],[1566,"PVC BALL VALVE HEAVY 3/4\" - FORCE",330.0],[1567,"PVC BIP TAP",140.0],[1568,"PVC COATED MESH WIRE GREEN",655.0],[1569,"PVC COATED WIRE GREEN",625.0],[1570,"PVC CONCRETE PAN",210.0],[1571,"PVC JET SHOWER 3\" ROUND - INDIA",350.0],[1572,"PVC JET SHOWER 4\" ROUND - INDIA",375.0],[1573,"PVC JET SHOWER 4\" SQUARE - INDIA",375.0],[1574,"PVC JET SHOWER 5\" ROUND CRYSTAL - INDIA",450.0],[1575,"PVC JET SHOWER 5\" ROUND SOLID - INDIA",450.0],[1576,"PVC JET SHOWER SLIM 6 X6",790.0],[1577,"PVC SHOWER HEAD - LARGE",70.0],[1578,"PVC SHOWER HEAD - SMALL",40.0],[1579,"PVC SOAP TRAY SOLID - BLUE",295.0],[1580,"PVC SOAP TRAY SOLID - INDIA",295.0],[1581,"PVC SOAP TRAY SOLID - PINK",295.0],[1582,"PVC SOAP TRAY SOLID - WHITE",345.0],[1583,"PVC SOAP TRAY TRANSPARENT",425.0],[1584,"PVC UNION 1\"",275.0],[1585,"PVC UNION 3/4\"",235.0],[1586,"PVC UNION 1 1/2\"",690.0],[1587,"PVC WELDED MESH 1/2*1/2 \u00d7 15MTR (1MTR)",11750.0],[1588,"PVC WELDED MESH 1/2*1/2 \u00d7 30MTR (1MTR)",12850.0],[1589,"PVC WELDED MESH 3/4*3/4 \u00d7 30MTR (1MTR)",11450.0],[1590,"PVC WELDED MESH 4FT 1/2*1/2 15MTR",13500.0],[1591,"QUICK COUPLER SET 5PCS",955.0],[1592,"QUICK COUPLER SH PH 40",600.0],[1593,"R/C - 833875",40000.0],[1594,"RAISING BAR SET NEW ROUND",null],[1595,"RAISING BAR SET SQUARE - 610",44750.0],[1596,"RASING BAR SET",null],[1597,"RAT CAGE - LARGE",595.0],[1598,"RAT CAGE - SMALL",495.0],[1599,"RAT CAGE FOLDABLE (S)",null],[1600,"RAT CHAT BELT 10MTR",1850.0],[1601,"RAT GUARD 3FT",90.0],[1602,"RAT RAP STEEL",1550.0],[1603,"RAT TRAP PVC",140.0],[1604,"RATCHET BELT 10M",1790.0],[1605,"RATCHET HANDLE 1/2\" HEAVY",1150.0],[1606,"RECHARGEABLE ALUMINUM TORCH 1W (AKS)",1350.0],[1607,"RECHARGEABLE ALUMINUM TORCH 3W (AKS)",1650.0],[1608,"RECHARGEABLE HANDHELD FLASHLIGHT AKKO STAR",3150.0],[1609,"RECHARGEABLE LED TORCH 2+1W (AKS)",990.0],[1610,"RECHARGEABLE LED TORCH 5+2W (AKS)",1760.0],[1611,"RECHARGEABLE TORCH 15+3W (AKS)",2150.0],[1612,"RED POWDER 1KG",690.0],[1613,"RED POWDER DRUMP 20 KG",13600.0],[1614,"RED POWDER YIPIN",21500.0],[1615,"RED SAND PAPER ROLL 4\" \u00d7 100 - 50M",6800.0],[1616,"RED SAND PAPER ROLL 4\" \u00d7 120 - 50M",6800.0],[1617,"RED SAND PAPER ROLL 4\" \u00d7 40 - 50M",6800.0],[1618,"RED SAND PAPER ROLL 4\" \u00d7 60 - 50M",6800.0],[1619,"RED SAND PAPER ROLL 4\" \u00d7 80 - 50M",6800.0],[1620,"RED SAND PAPER ROLL 6\" -",9750.0],[1621,"RED SAND PAPER ROLL 6\" -",9750.0],[1622,"RED SAND PAPER ROLL 6\" - 40",9750.0],[1623,"RED SAND PAPER ROLL 6\" - 60",9750.0],[1624,"RED SAND PAPER ROLL 6\" \u00d7 120 - 50M",9750.0],[1625,"RED SAND PAPER ROLL 6\" \u00d7 80",9750.0],[1626,"RETURN CHAQUE",null],[1627,"RHOMBOID LED PANEL LIGHT 17W AKKO STAR",1700.0],[1628,"RHOMBOID LED PANEL LIGHT 22W AKKO STAR",1950.0],[1629,"RHOMBOID LED PANEL LIGHT 33W AKKO STAR",2800.0],[1630,"RIVERT GUN HEAVY",975.0],[1631,"RIVERT GUN HEAVY DUTY 17\"",2450.0],[1632,"RMR SHOWER PANEL SS 304 - 17 (2272",38900.0],[1633,"RMR SS LONG GULLY COVER 60CM",3490.0],[1634,"RMR SS LONG GULLY COVER 30CM",1850.0],[1635,"RMR SS ROUND HAND SHOWER",2150.0],[1636,"RMR SS SQUARE HAND SHOWER",2350.0],[1637,"RMR STANDARD - SHOWER BAR WITH MIXER - 06 (1487)",27000.0],[1638,"RMR STANDARD - SHOWER BAR WITH MIXER - 07 (1488)",23500.0],[1639,"RMR TRIPLE SHELF MIRROR - 1066",6000.0],[1640,"RMR TRIPLE SHELF MIRROR - 1067",6000.0],[1641,"RMR VANITY BASIN (2332)",22500.0],[1642,"RMR VANITY BASIN 2025",null],[1643,"RMR VANITY BASIN BLACK (2443)",32500.0],[1644,"RMR VANITY BASIN CRM 215 (2227)",16000.0],[1645,"RMR VANITY BASIN CRM 220 (2030)",22750.0],[1646,"RMR VANITY BASIN CRMB",16500.0],[1647,"ROD BRACKET 15MM",1450.0],[1648,"ROD BRACKET 20MM",1450.0],[1649,"ROD BRACKET 25MM",1475.0],[1650,"ROLLER 4\" 5PCS SLEEVE SET",425.0],[1651,"ROLLER BRUSH 4\"",215.0],[1652,"ROLLER BRUSH 4\" - 5PCS SET",null],[1653,"ROLLER BRUSH 4\" - REFILL JUMBO",98.0],[1654,"ROLLER BRUSH 4\" - REFILL EMULSION",69.0],[1655,"ROLLER BRUSH 4\" - REFILL ENAMEL",70.0],[1656,"ROLLER BRUSH 4\" HANDLE",175.0],[1657,"ROLLER BRUSH 9\"",330.0],[1658,"ROLLER BRUSH 9\" HALLS",440.0],[1659,"ROLLER BRUSH 9\" - REFILL",265.0],[1660,"ROLLER BRUSH 9\" C9576",380.0],[1661,"ROLLER BRUSH 9\" KING",540.0],[1662,"ROOFING BOLT & NUT 1/4\" \u00d7 01\"",1400.0],[1663,"ROOFING BOLT & NUT 1/4\" \u00d7 02\"",1925.0],[1664,"ROOFING BOLT & NUT 1/4\" \u00d7 03\"",2430.0],[1665,"ROOFING BOLT & NUT 1/4\" \u00d7 04\"",2890.0],[1666,"ROOFING BOLT & NUT 1/4\" \u00d7 1 1/2\"",1600.0],[1667,"ROOFING BOLT & NUT 1/4\" \u00d7 1 1/4\"",1520.0],[1668,"ROOFING BOLT & NUT 1/4\" \u00d7 1/2\"",1290.0],[1669,"ROOFING BOLT & NUT 1/4\" \u00d7 2 1/2\"",2100.0],[1670,"ROOFING BOLT & NUT 1/4\" \u00d7 3 1/2\"",2625.0],[1671,"ROOFING BOLT & NUT 1/4\" \u00d7 3/4\"",1330.0],[1672,"ROOFING BOLT & NUT 1/4\" \u00d7 4 1/2\"",3050.0],[1673,"ROOFING BOLT & NUT 3/16\" \u00d7 01\"",1070.0],[1674,"ROOFING BOLT & NUT 3/16\" \u00d7 02\"",1330.0],[1675,"ROOFING BOLT & NUT 3/16\" \u00d7 03\"",1560.0],[1676,"ROOFING BOLT & NUT 3/16\" \u00d7 1 1/2\"",1215.0],[1677,"ROOFING BOLT & NUT 3/16\" \u00d7 1 1/4\"",1125.0],[1678,"ROOFING BOLT & NUT 3/16\" \u00d7 1/2\"",850.0],[1679,"ROOFING BOLT & NUT 3/16\" \u00d7 2 1/2\"",1475.0],[1680,"ROOFING BOLT & NUT 3/16\" \u00d7 3/4\"",975.0],[1681,"ROOFING FELT - 10MTR",1950.0],[1682,"ROOFING SCREW 3 1/2\"",625.0],[1683,"ROOFING SCREW 3\"",625.0],[1684,"ROOFING SCREW 4 1/2\"",625.0],[1685,"ROOFING SCREW 4\"",625.0],[1686,"ROUND BASIN (1284)",null],[1687,"ROUND SHAPE COMMED (AS303)",43000.0],[1688,"RUBBER HAMMER F/H - 340G",590.0],[1689,"RUBBER HAMMER F/H - 460G",690.0],[1690,"RUBBER HAMMER F/H - 700G",790.0],[1691,"RUBBER TAP WASHER",null],[1692,"RUST REMOVER 100 ML",325.0],[1693,"RUST REMOVER 200 ML",440.0],[1694,"RUST REMOVER 400 ML",550.0],[1695,"SAFETY GLASS BLACK",95.0],[1696,"SAFETY GLASS CLEAR",95.0],[1697,"SAFETY HELMET",525.0],[1698,"SAFTY GLASS - BLACK",95.0],[1699,"SAFTY GLASS - CLEAR",95.0],[1700,"SAFTY GOOGLE TINTED",525.0],[1701,"SAFTY HELMET - WHITE",550.0],[1702,"SAFTY HELMET - YELLOW",550.0],[1703,"SAND PAPER ROLL 6\" - 40 50M",9750.0],[1704,"SAND PAPER WHITE #40",85.0],[1705,"SAND PAPER WHITE #60",85.0],[1706,"SAND PAPER WHITE #80",85.0],[1707,"SAND PAPER WHITE (120)",85.0],[1708,"SAND PAPER WHITE (150)",85.0],[1709,"SAND PAPER WHITE (240)",85.0],[1710,"SCALE FLAT SF 400",850.0],[1711,"SCALE PROTABLE - 50KG",915.0],[1712,"SCALE PROTEBL - 40KG",730.0],[1713,"SCRAPER RUBBER HANDLE - 2 1/2\"",185.0],[1714,"SCRAPER RUBBER HANDLE - 2\"",170.0],[1715,"SCRAPER RUBBER HANDLE - 3\"",200.0],[1716,"SCRAPER RUBBER HANDLE - 4\"",220.0],[1717,"SCRAPER RUBBER HANDLE - 5\"",240.0],[1718,"SCRAPER RUBBER HANDLE - 6\"",250.0],[1719,"SCRAPER RUBBER HANDLE 1 1/2\"",165.0],[1720,"SCREW BIT SET",null],[1721,"SCREW DRIVER 10\" CROSS CRV",345.0],[1722,"SCREW DRIVER 10\" FLAT CRV",345.0],[1723,"SCREW DRIVER 21 PCS HEAVY",null],[1724,"SCREW DRIVER 21 PCS SET HEAVY",null],[1725,"SCREW DRIVER 6\"",195.0],[1726,"SCREW DRIVER 6\" X",195.0],[1727,"SCREW DRIVER 7 PCS SET",2350.0],[1728,"SCREW DRIVER 8\"",220.0],[1729,"SCREW DRIVER 8\" CROSS",220.0],[1730,"SCREW DRIVER 8\" POINT",220.0],[1731,"SCREW DRIVER 8\" FLAT",220.0],[1732,"SCREW DRIVER AMERICAN 6\" CROSS",null],[1733,"SCREW DRIVER CHUBBY FLAT 6MM",295.0],[1734,"SCREW DRIVER CHUBBY POINT 6MM",295.0],[1735,"SCREW DRIVER DOUBLE SIDE HEAVY 6\"",265.0],[1736,"SCREW DRIVER HEAVY 10\" CROSS AMERICAN",310.0],[1737,"SCREW DRIVER HEAVY 10\" FLAT AMERICAN",310.0],[1738,"SCREW DRIVER HEAVY 12\" CROSS AMERICAN",310.0],[1739,"SCREW DRIVER HEAVY 4\" CROSS AMERICAN",245.0],[1740,"SCREW DRIVER HEAVY 6\" CROSS AMERICAN",270.0],[1741,"SCREW DRIVER HEAVY 6\" FLAT AMERICAN",270.0],[1742,"SCREW DRIVER HEAVY 8\" CROSS AMERICAN",290.0],[1743,"SCREW DRIVER HEAVY 8\" FLAT AMERICAN",290.0],[1744,"SCREW DRIVER SET 10PCS HEAVY - DOUBANG",2250.0],[1745,"SCREW DRIVER SET 7PCS",2450.0],[1746,"SCREW DRIVER SLIM 3\" FLAT",135.0],[1747,"SCREW DRIVER SLIM 3\" POINT",135.0],[1748,"SCREW DRIVER SLIM 4\" FLAT",155.0],[1749,"SCREW DRIVER SLIM 4\" POINT",155.0],[1750,"SCREW DRIVER SLIM 6\" FLAT",175.0],[1751,"SCREW DRIVER SLIM 6\" POINT",175.0],[1752,"SCREW DRIVER SLIM 8\" FLAT",190.0],[1753,"SCREW DRIVER SLIM 8\" POINT",190.0],[1754,"SCREW EXTRACTOR 6PCS",775.0],[1755,"SCREW NAIL SGL 1*7",10.9],[1756,"SCREW NAIL SGL 3/4*6",7.9],[1757,"SCREW NAIL SGL 3/4*8",9.9],[1758,"SCREW NAIL SGL 5/8*4",6.5],[1759,"SCREW NAIL SS 1*6",9.0],[1760,"SCREW NAIL SS 3/4*6",7.9],[1761,"SCREW NAIL SS 3/4*7",8.9],[1762,"SCREW NAIL SS 3/4*8",9.9],[1763,"SCREW NAIL SS 5/8*4",6.5],[1764,"SDS DRILL BIT 10 \u00d7 110",310.0],[1765,"SDS DRILL BIT 10 \u00d7 210",310.0],[1766,"SDS DRILL BIT 12 \u00d7 210",345.0],[1767,"SDS DRILL BIT 12 \u00d7 310",395.0],[1768,"SDS DRILL BIT 12*310",null],[1769,"SDS DRILL BIT 14 \u00d7 210",375.0],[1770,"SDS DRILL BIT 14 \u00d7 350",550.0],[1771,"SDS DRILL BIT 16 \u00d7 210",425.0],[1772,"SDS DRILL BIT 6 \u00d7 110",190.0],[1773,"SDS DRILL BIT 6 \u00d7 160",200.0],[1774,"SDS DRILL BIT 6 \u00d7 210",230.0],[1775,"SDS DRILL BIT 7 \u00d7 110",215.0],[1776,"SDS DRILL BIT 7 \u00d7 160",215.0],[1777,"SDS DRILL BIT 8 \u00d7 110",220.0],[1778,"SDS DRILL BIT 8 \u00d7 160",220.0],[1779,"SEAT COVER NAIL BRACKET SS WITH SCREW (1796)",990.0],[1780,"SEAT COVER PVC BRACKET",null],[1781,"SELF BRACKET 12 \u00d7 14",null],[1782,"SENJI PAD LOCK 50MM",null],[1783,"SENJI PAD LOCK LONG 1 1/2\"",null],[1784,"SHADED MESH 60% 6FT 100MTR",13850.0],[1785,"SHADED MESH 80% - 2MTR \u00d7 100MTR",16320.0],[1786,"SHELF 4 IN 1 HEAVY - INDIA",1090.0],[1787,"SHELF BRACKET 04 \u00d7 05",2700.0],[1788,"SHELF BRACKET 06 \u00d7 08",2700.0],[1789,"SHELF BRACKET 08 \u00d7 10",2700.0],[1790,"SHELF BRACKET 10 \u00d7 12",2700.0],[1791,"SHELF BRACKET 12 \u00d7 14",3300.0],[1792,"SHELF BRACKET FOLDABLE 10\"",1190.0],[1793,"SHELF BRACKET FOLDABLE 12\"",1400.0],[1794,"SHELF BRACKET FOLDABLE 16\"",1690.0],[1795,"SHELF CORNER HEAVY 5 IN 1",985.0],[1796,"SHIPHON PUMP - DP 14",275.0],[1797,"SHIPHON PUMP - DP 14 (KOREA)",595.0],[1798,"SHIPHON PUMP - DP 25 (KOREA)",3850.0],[1799,"SHIPHON PUMP DP-20 (KOREA)",3400.0],[1800,"SHIPHON PUMP NORMAL RED",145.0],[1801,"SHIPON PUMP DP-20 (KOREA)",2850.0],[1802,"SHIPON PUMP DP-25 (KOREA)",3850.0],[1803,"SHOWER ARM 40CM SS",null],[1804,"SHOWER BAR SET (PIANO) COPPER RMR - 11 (2258)",22750.0],[1805,"SHOWER BAR SET (PIANO) COPPER RMR - 14 (2259)",23500.0],[1806,"SHOWER BAR SET (PIANO) RMR - 03 (2466)",23000.0],[1807,"SHOWER BAR SET - 11",22500.0],[1808,"SHOWER BAR SET MIXER BRASS RMR STANDARD [1486]",27000.0],[1809,"SHOWER BAR SET MIXER SINGLE [2544]",19500.0],[1810,"SHOWER BAR WITH MIXER - RMR STANDARD - 05",26500.0],[1811,"SHOWER CUBICLE CORNER",75000.0],[1812,"SHOWER CUBICLE ROUND",64500.0],[1813,"SHOWER CUBICLE SQUARE",64500.0],[1814,"SHOWER PANEL BLACK & GOLD AS613",39750.0],[1815,"SHOWER PANEL BLACK RMR - 13 (2275)",26500.0],[1816,"SHOWER PANEL GLOSS BLACK BT",null],[1817,"SHOWER PANEL MAT SS304 RMR - 15 (1097)",38900.0],[1818,"SHOWER PANEL NOZZLE (2052)",2350.0],[1819,"SHOWER PANEL SILVER BT",null],[1820,"SHOWER PANEL SS RMR - 12 (2274)",25750.0],[1821,"SHOWER ROOM ROUND",null],[1822,"SHOWER ROOM SQUARE",null],[1823,"SILLICON 15G - CLEAR",115.0],[1824,"SILLICON 300G - BLACK",545.0],[1825,"SILLICON 300G - CLEAR",545.0],[1826,"SILLICON 300G - WHITE",545.0],[1827,"SILLICON 35G BLACK",210.0],[1828,"SILLICON 35G CLEAR",195.0],[1829,"SILLICON 50G BLACK",225.0],[1830,"SILLICON 85G BLACK",325.0],[1831,"SILLICON 85G CLEAR",295.0],[1832,"SILLICON GUN BLACK",575.0],[1833,"SILLICON GUN BLUE",475.0],[1834,"SILLICON GUN ORANGE",450.0],[1835,"SILLICON GUN ORANGE/SILVER HEAVY",790.0],[1836,"SILLICON GUN PVC & STEEL",595.0],[1837,"SILLICON GUN YELLOW HEAVY",625.0],[1838,"SINGLE BRACKET",27.0],[1839,"SINGLE BRACKET - P/C",null],[1840,"SINGLE WATER FILTER (2038)",3650.0],[1841,"SINGLE WATER FILTER (2039)",3850.0],[1842,"SINK 75\u00d746 BLACK 4 IN 1",null],[1843,"SINK DEEP BOWL 45\u00d739 RMR (1536)",3400.0],[1844,"SINK DEEP BOWL 50*40 (2517)",4700.0],[1845,"SINK DISPENSER BLACK (2189)",785.0],[1846,"SINK DISPENSER SS (2190)",785.0],[1847,"SINK LARGE 36 \u00d7 18",4490.0],[1848,"SINK SMART MULTI FUNCTION RMR (1485)",47500.0],[1849,"SINK SUCKER SS",725.0],[1850,"SINK TAP ABS INDIA",390.0],[1851,"SINK TAP ABS ROUND WHITE HEAD GALLAXY (1507)",550.0],[1852,"SINK TAP BLACK LIVER GALLAXY (2588)",975.0],[1853,"SINK TAP BLACK MAT CONE NV RMR (2058)",2850.0],[1854,"SINK TAP BLACK MAT CURVE BT RMR (2060)",2700.0],[1855,"SINK TAP BLACK MAT FLEXIBLE (DY) RMR (1340)",2800.0],[1856,"SINK TAP BLACK MAT SQUARE (SF) RMR (2059)",3150.0],[1857,"SINK TAP BLACK SQUARE RMR (1581)",4750.0],[1858,"SINK TAP CARD HEAVY PRINCE",690.0],[1859,"SINK TAP CP BAG GALLAXY (1858)",790.0],[1860,"SINK TAP CP LIVER GALLAXY (1902)",950.0],[1861,"SINK TAP FLEXIBLE MAT (1222)",2750.0],[1862,"SINK TAP FLEXIBLE SS (1222)",null],[1863,"SINK TAP HEAVY ABS LIVER GALLAXY (1506)",575.0],[1864,"SINK TAP KITCHEN GALLAXY (2134)",1750.0],[1865,"SINK TAP LIVER HEAVY CARD GALLAXY (1504)",750.0],[1866,"SINK TAP MAT CONE (NV) RMR (1333)",2950.0],[1867,"SINK TAP MAT SQUARE (SF) RMR (1816)",3300.0],[1868,"SINK TAP MAT SQUARE RMR (1337)",4750.0],[1869,"SINK TAP MAT WAVE (HJ) RMR (1765)",3850.0],[1870,"SINK TAP MIXER PULLING BLACK RMR (2555)",4750.0],[1871,"SINK TAP MIXER PULLING MAT RMR (2554)",5900.0],[1872,"SINK TAP SQUARE HEAVY SHORT GALLAXY (1025)",545.0],[1873,"SINK TAP SS RMR (1330)",2350.0],[1874,"SINK TAP SS SQUARE RMR (1546)",4750.0],[1875,"SINK TAP URENOS",2400.0],[1876,"SINK WAST 1 1/2\" (1100)",125.0],[1877,"SINK WAST 1 1/2\" BRASS HEAVY RMR (1805)",1075.0],[1878,"SINK WAST 1 1/4 - 1 1/2 ACCURATE",null],[1879,"SINK WAST 1 1/4\" INDIA",null],[1880,"SINK WAST 4\" SS 8110 (1103)",615.0],[1881,"SLEDGE HAMMER 2LB F/H",950.0],[1882,"SLEDGE HAMMER 3LB F/H",1150.0],[1883,"SLEDGE HAMMER 4LB F/H",1350.0],[1884,"SLEDGE HAMMER 6LB",1300.0],[1885,"SLEDGE HAMMER 8LB",1700.0],[1886,"SMART COMMED RMR (2604)",99000.0],[1887,"SMART MIRROR",null],[1888,"SMART MIRROR - 352",17750.0],[1889,"SMART MIRROR - 353",17750.0],[1890,"SMART MIRROR ROUND (353)",18000.0],[1891,"SMART MULTI FUNCTION GOLD SINK - 6 IN 1",58500.0],[1892,"SNAP BUTTON PLAIR",650.0],[1893,"SOAP DISH DOUBLE SS",1250.0],[1894,"SOAP DISH GLASS WITH HOLDER BAG GALLAXY (1059)",1100.0],[1895,"SOAP DISH GLASS WITH HOLDER BLACK SQUARE - WESDA (2415)",1750.0],[1896,"SOAP DISH NORMAL",450.0],[1897,"SOAP DISH ROUND GLASS ONLY (1104)",410.0],[1898,"SOAP DISH SINGLE NORMAL (1402)",460.0],[1899,"SOAP DISH SQUARE GLASS ONLY (1817)",425.0],[1900,"SOAP DISH SS LARGE WESDA (1955)",1900.0],[1901,"SOAP DISH SS MEDIUM WESDA (1840)",1300.0],[1902,"SOAP DISH SS SINGLE WESDA (1721)",665.0],[1903,"SOAP DISH SS SINGLE WESDS WHITE & BLUE BOX (1812)",700.0],[1904,"SOAP DISH SS WITH GLASS ROUND RMR (1433)",1590.0],[1905,"SOAP DISH SS WITH GLASS SQUARE RMR (1214)",1690.0],[1906,"SOAP DISPENSER ABS CP",1265.0],[1907,"SOAP DISPENSER ABS CP (1520)",1475.0],[1908,"SOAP DISPENSER ABS GRAY (1521)",1450.0],[1909,"SOAP HOLDER GLASS",null],[1910,"SOAP HOLDER TRANSPARENT INDIA",null],[1911,"SOCKET BRASS 1/2",null],[1912,"SOCKET BRASS 1/2*3/4 (2590)",485.0],[1913,"SOCKET BRASS FEMALE & MALE 1/2*3/8 (2592)",485.0],[1914,"SOCKET BRASS MALE 1/2*3/4 (2593)",485.0],[1915,"SOLDERING",390.0],[1916,"SOLDERING IRON 30W AKKO STAR",595.0],[1917,"SPARK PLUG REMOVAL SPANNER 16/21",410.0],[1918,"SPECKS BLACK",null],[1919,"SPONGE 3 JUMBO",null],[1920,"SPRAY CANE 1 LTR",165.0],[1921,"SPRAY GUN 5PCS SET",7650.0],[1922,"SPRAY GUN F75 - BLUE BOX",2450.0],[1923,"SPRAY GUN F75 - ORANGE",2550.0],[1924,"SPRAY GUN F75 - YELLOW BOX",2350.0],[1925,"SPRAY GUN F75 HEAVY",2450.0],[1926,"SPRAY GUN F75 XUBIN",2490.0],[1927,"Spray Gun Foam Car Flat",5500.0],[1928,"Spray Gun Pneumatic Cleaning",2810.0],[1929,"SPRAY PAINT - CLEAR",725.0],[1930,"SPRAY PAINT - GOLD",725.0],[1931,"SPRAY PAINT - GRAY",725.0],[1932,"SPRAY PAINT - SILVER",750.0],[1933,"SPRAY PAINT - BLACK",725.0],[1934,"SPRAY PAINT - BLUE",710.0],[1935,"SPRAY PAINT - DIAMOND BLUE",728.0],[1936,"SPRAY PAINT - FRESH GREEN",695.0],[1937,"SPRAY PAINT - GREEN",725.0],[1938,"SPRAY PAINT - MAT BLACK",710.0],[1939,"SPRAY PAINT - MAT WHITE",725.0],[1940,"SPRAY PAINT - MEDIUM BLUE",725.0],[1941,"SPRAY PAINT - WHITE",725.0],[1942,"SPRAY PAINT - YELLOW",725.0],[1943,"SPRAY PAINT ASSOTED",780.0],[1944,"SPRAY PAINT BRIGHT GOLD",750.0],[1945,"SPRAY PAINT BRIGHT SILVER",750.0],[1946,"SPRAY PAINT SUZUKI RED",750.0],[1947,"SPRAYER 16 LTR",2950.0],[1948,"SPRINKLE 1\"",295.0],[1949,"SPRINKLER 1/2-3/4",78.0],[1950,"SPRIT LEVEL 12\" - HEAVY",710.0],[1951,"SPRIT LEVEL 18\" - HEAVY",820.0],[1952,"SPRIT LEVEL 24\" - HEAVY",950.0],[1953,"SPRIT LEVEL 36\" - HEAVY",1110.0],[1954,"SPRIT LEVEV 9\" HEAVY",450.0],[1955,"SQUARE SOAP DISH GLASS",1775.0],[1956,"SQUARE TAP HANDLE ONLY (2270)",575.0],[1957,"SQUARE- COMMED & CISTERN (BLACK LINE) AS305- BL",null],[1958,"SQUATTING PAN SS",9500.0],[1959,"SS 1 1/4\" BASIN WASTE INDIA",550.0],[1960,"SS BASIN TAP",1595.0],[1961,"SS BASIN TAP SQUARE - DURA LIFE",3125.0],[1962,"SS BUT HINGES 2 1/2\"",825.0],[1963,"SS BUT HINGES 2\"",725.0],[1964,"SS BUT HINGES 3\"",925.0],[1965,"SS CP CAP HEAVY - SQUARE (1444)",95.0],[1966,"SS CUP NUT 10MM",null],[1967,"SS CUP NUT 12MM",null],[1968,"SS DUSTBIN ROUND 12L (2236)",5500.0],[1969,"SS DUSTBIN ROUND 8L (2235)",4950.0],[1970,"SS FLAT STRIP 3MM 1\" (304)",4250.0],[1971,"SS HASP & STEPLES - SELF LOCK",690.0],[1972,"SS JET SHOWER 6 \u00d7 6",1150.0],[1973,"SS JET SHOWER 6 \u00d7 6 - 01",null],[1974,"SS JET SHOWER 6 \u00d7 6 FULL SEALED",1600.0],[1975,"SS JET SHOWER 6\u00d76",1518.0],[1976,"SS KITCHEN SINK 30 \u00d7 18",null],[1977,"SS KITCHEN SINK 30 \u00d7 18 (1443)",null],[1978,"SS MIXER FLEXIBLE HOSE - 1 1/2 FT",285.0],[1979,"SS MIXER FLEXIBLE HOSE - 2 FT",320.0],[1980,"SS NUT & BOLT 6 \u00d7 25 (304)",40.0],[1981,"SS NUT & BOLT 6 \u00d7 50 (304)",null],[1982,"SS NUT & BOLT 6 \u00d7 75 (304)",65.0],[1983,"SS PAD BOLT 4\"",235.0],[1984,"SS PAD BOLT 6\"",315.0],[1985,"SS PAD BOLT 8\"",395.0],[1986,"SS PAD BOLT HEAVY 4\"",275.0],[1987,"SS SHELF WITH TOOTHPASTE HOLDER - IND",775.0],[1988,"SS SINK TAP - PLM",null],[1989,"SS TOWER BOLT 3\"",195.0],[1990,"SS TOWER BOLT 3\" HEAVY",195.0],[1991,"SS TOWER BOLT 4\"",265.0],[1992,"SS TOWER BOLT 4\" HEAVY",255.0],[1993,"SS TOWER BOLT 5\"",265.0],[1994,"SS TOWER BOLT 5\" HEAVY",295.0],[1995,"SS TOWER BOLT 6\"",315.0],[1996,"SS WELDING ROD 12",null],[1997,"SS WELDING ROD 12 (2.5)",11950.0],[1998,"SS WINDOW BOX CUP 1\"\u00d7 1/2\"",65.0],[1999,"SS WINDOW BOX CUP 1 1/4\" \u00d7 5/8\"",68.0],[2000,"SS WINDOW ROUND CUP 3/4\"",48.0],[2001,"SS WINDOW ROUND CUP 5/8\"",42.0],[2002,"STANLY TOWER BOLT 3\"",null],[2003,"STANLY TOWER BOLT 4\"",145.0],[2004,"STEEL BUT HINGES 3*2\"",215.0],[2005,"STEEL BUT HINGES 4*2 1/2\"",325.0],[2006,"STEEL BUT HINGES 4*2\"",285.0],[2007,"STEEL CUPBOARD LOCK",775.0],[2008,"STEEL CUPBOARD LOCK - SUMO",775.0],[2009,"STEEL EPOXY",295.0],[2010,"STEEL SHOWEL",975.0],[2011,"STEEL TAPE 10 MTR",null],[2012,"STEEL TAPE 10 MTR HEAVY",930.0],[2013,"STEEL TAPE ADEX 5MTR",595.0],[2014,"STEEL TAPE ADEX 7.5MTR",715.0],[2015,"STEEL TOWER BOLT 2 1/2\"",1260.0],[2016,"STEEL TOWER BOLT 3\"",1440.0],[2017,"STEEL TOWER BOLT 4\"",1620.0],[2018,"STEEL TOWER BOLT 5\"",2280.0],[2019,"STEP LADDER 4FT",10600.0],[2020,"STEPLER MACHINE HEAVY",1990.0],[2021,"STEPLER MACHINE HEAVY - BEBONA",null],[2022,"STEPLER PIN 8MM",380.0],[2023,"STICKY PAD 4 \"",null],[2024,"STONE BIT HILTY 14MM*250MM FLAT",390.0],[2025,"STONE BIT HILTY 14MM*250MM POINT",390.0],[2026,"STONE BIT HILTY 14MM*350MM FLAT",490.0],[2027,"STONE BIT HILTY 14MM*350MM POINT",490.0],[2028,"STREET LAMP 100W (AKS)",7350.0],[2029,"STREET LAMP 50W (AKS)",4500.0],[2030,"SUPER GLUE BOTTLE",230.0],[2031,"SUPER GLUE CARD - BLACK",690.0],[2032,"SUPER GLUE PANICOL",720.0],[2033,"SUPER THIN DIAMOND WHEEL 4 1/2\"",985.0],[2034,"SUPER THIN DIAMOND WHEEL 4\"",885.0],[2035,"SUS 304 HEAD SHOWER SQUARE 12*12 - AS206",5600.0],[2036,"SUS 304 SQUARE HEAD SHOWER 18*18 - AS214",7850.0],[2037,"SUS BOX BAR 1 1/4 \u00d7 5/8",null],[2038,"SUS BOX BAR 1\u00d7 1/2\"",null],[2039,"SUS ROUND TUBE 3/4\" (202)",null],[2040,"SUS ROUND TUBE 5/8\" (202)",null],[2041,"SWITCH NAIL 1 1/2\"",1200.0],[2042,"SWITCH NAIL 1\"",585.0],[2043,"SWITCH NAIL 2 1/2\"",10.0],[2044,"SWITCH NAIL 2\"",685.0],[2045,"SWITCH NAIL 3\"",null],[2046,"SYPHON ONLY",null],[2047,"T.T WIRE",2100.0],[2048,"TABLE LAMP RECHARGEABLE LARGE (AKS)",2725.0],[2049,"TABLE LAMP RECHARGEABLE SMALL (AKS)",2290.0],[2050,"TANK BALL 1/2 INCH",null],[2051,"TANK BELT FLAT 10MM \u00d7 5FT",265.0],[2052,"TANK BELT ROUND 10MM \u00d7 5FT",295.0],[2053,"TANK BELT ROUND 12MM \u00d7 5FT",265.0],[2054,"TANK BELT ROUND SLIM 8MM \u00d7 4' (2PCS)",360.0],[2055,"TAP BRASS NUT (1739)",195.0],[2056,"TAP CONNECTOR RUBBER BLACK",27.0],[2057,"TAP CONNECTOR RUBBER MIX COLOURS",35.0],[2058,"TAP HEAD PLM",null],[2059,"TARPAULIN 8 FEET BLUE & SILVER",18500.0],[2060,"TARPAULIN 8 FEET ORANGE & BLUE",19500.0],[2061,"TARPAULIN TENT BLUE & GRAY 10*12",2750.0],[2062,"TARPAULIN TENT BLUE & GRAY 10*15",3100.0],[2063,"TARPAULIN TENT BLUE & GRAY 15*20",4950.0],[2064,"TARPAULIN TENT BLUE & GRAY 20*20",5200.0],[2065,"TARPAULIN TENT BLUE & GRAY 25*20",6950.0],[2066,"TEE BRASS 1/2\" (1318)",495.0],[2067,"TEE HANDLE 10\"",320.0],[2068,"TEE HANDLE 10MM",null],[2069,"TEE HANDLE 8\"",300.0],[2070,"TEE HANDLE 8MM",null],[2071,"TEE HINGES 6\"",255.0],[2072,"TEE HINGES 8\"",385.0],[2073,"TEE HINGES 10\"",425.0],[2074,"TEE HINGES 12\"",515.0],[2075,"TEE HINGES 4\"",200.0],[2076,"TEE HINGES 5\"",230.0],[2077,"TESTER LARGE",1980.0],[2078,"TESTER MEDIUM",1620.0],[2079,"TESTER MEDIUM NORMAL",70.0],[2080,"TESTER SMALL",1250.0],[2081,"THREAD BAR 1/2\" 2M",695.0],[2082,"THREAD BAR 1/4\" 2M",235.0],[2083,"THREAD BAR 3/8\" 2M",390.0],[2084,"THREAD BAR 5/16\" 2M",295.0],[2085,"THREAD SEAL TAPE 1\" \u00d7 10M",70.0],[2086,"THREAD SEAL TAPE 1/2\" \u00d7 10M",32.0],[2087,"THREAD SEAL TAPE 1/2\" \u00d7 10M H/P",35.0],[2088,"THREAD SEAL TAPE 3/4\" \u00d7 10M",55.0],[2089,"THREAD SEAL TAPE 3/4\" \u00d7 10M H/P",59.0],[2090,"TILE BEADING MEGA",null],[2091,"TILE BIT CROSS VEGA 06MM",295.0],[2092,"TILE BIT CROSS VEGA 08MM",365.0],[2093,"TILE BIT CROSS VEGA 12MM",515.0],[2094,"TILE CROSS 1.0 MM",90.0],[2095,"TILE CROSS 1.5 MM",100.0],[2096,"TILE CROSS 2.0 MM",115.0],[2097,"TILE CROSS 2.5 MM",125.0],[2098,"TILE CROSS 3.0 MM",125.0],[2099,"TILE CROSS SCREW TYPE (2500)",790.0],[2100,"TILE CROSS SCREW TYPE BLUE (2501)",790.0],[2101,"TILE EDGE WHEEL - 03",1290.0],[2102,"TILE EDGE WHEEL - 04",1290.0],[2103,"TILE EDGE WHEEL - 09",1175.0],[2104,"TILE EDGE WHEEL - 10",1875.0],[2105,"TILE EDGE WHEEL - 11",1390.0],[2106,"TILE EDGE WHEEL - 12",1525.0],[2107,"TILE EMPTY DRUM GLUE ROCKIYA",1250.0],[2108,"TILE GRANITE WHEEL 4 1/2\"",null],[2109,"TILE GRANITE WHEEL 4\" NEW LONGER",450.0],[2110,"TILE HOLE SAW 06MM",345.0],[2111,"TILE HOLE SAW 08MM",390.0],[2112,"TILE HOLE SAW 10MM",415.0],[2113,"TILE HOLE SAW 12MM",445.0],[2114,"TILE HOLE SAW 14MM",585.0],[2115,"TILE HOLE SAW 16MM",690.0],[2116,"TILE HOLE SAW 18MM",690.0],[2117,"TILE LEVELING CLIP 1.0MM",750.0],[2118,"TILE LEVELING CLIP 1.0MM (2484)",790.0],[2119,"TILE LEVELING CLIP 1.5MM (1183)",790.0],[2120,"TILE LEVELING CLIP 2.0MM (1181)",790.0],[2121,"TILE LEVELING CLIP WHITE 2.0",790.0],[2122,"TILE MODEL BACK TO WALL COMMODE (2486)",57500.0],[2123,"TILE MODEL WALL HANG BASIN (2487)",34500.0],[2124,"TILE POSITIONER RED",790.0],[2125,"TILE POSITIONER RED (1186)",790.0],[2126,"TILE RIM KING",440.0],[2127,"TILE RIM KING BOX SS - EDGE (1777)",875.0],[2128,"TILE RIM KING MEGA (1182)",445.0],[2129,"TILE RIM KING MEGA SS (1184)",665.0],[2130,"TILE ROD 10MM",345.0],[2131,"TILE ROD 8MM",315.0],[2132,"TILE TIGHTING PLIER",985.0],[2133,"TIN MAN SNIP 10\"",850.0],[2134,"TIN MAN SNIP 8\"",725.0],[2135,"TIN TEX 1\"",325.0],[2136,"TIN TEX 1/2\"",325.0],[2137,"TIN TEX 3/4\"",325.0],[2138,"TIN TEX 5/8\"",325.0],[2139,"TINKERING HAMMER W/H",395.0],[2140,"TINMAN SNIP 12\"",1190.0],[2141,"TINMAN SNIP HEAVY 10\"",1190.0],[2142,"TINMAN SNIP HEAVY 12\"",1390.0],[2143,"TOOL BOX 21\" 5 TRAY",5350.0],[2144,"TOOTH BRUSH GLASS CUP ONLY - ROUND",null],[2145,"TOP IRON 1 1/2\"",2150.0],[2146,"TOP IRON 1 3/4\"",1630.0],[2147,"TOWEL BAR BLACK ROUND WESDA (2478)",975.0],[2148,"TOWEL BAR BLACK SQUARE WESDA (2479)",1750.0],[2149,"TOWEL BAR ROUND DOUBLE WESDA (1408)",1550.0],[2150,"TOWEL BAR ROUND WESDA (1404)",1150.0],[2151,"TOWEL BAR SQUARE DOUBLE WESDA (1498)",2100.0],[2152,"TOWEL BAR SQUARE SINGLE WESDA (1403)",1490.0],[2153,"TOWEL RACK SILVER ROUND (1639)",5500.0],[2154,"TOWER BOLT 10\" SGL 12MM",1360.0],[2155,"TOWER BOLT 10\" SS 12MM",1360.0],[2156,"TOWER BOLT 12\" SGL 12MM",1785.0],[2157,"TOWER BOLT 12\" SS 12MM",1785.0],[2158,"TOWER BOLT 12\" SS BGR",1785.0],[2159,"TOWER BOLT 18\" SGL 12MM",2640.0],[2160,"TOWER BOLT 18\" SS",2640.0],[2161,"TOWER BOLT 24\" SGL",3445.0],[2162,"TOWER BOLT 24\" SS",3445.0],[2163,"TOWER BOLT 4\" SS",565.0],[2164,"TOWER BOLT 6\" SGL 12MM",825.0],[2165,"TOWER BOLT 6\" SS 12MM",825.0],[2166,"TOWER BOLT 8\" SS",1085.0],[2167,"TOWER BOLT SGL 4\" 12MM",460.0],[2168,"TOWER BOLT SS 2\"",120.0],[2169,"TOWER BOLT SS 4\" 12MM",560.0],[2170,"TOWER BOLT SS 6\"",820.0],[2171,"TOWER BOLT SS 8\"",1080.0],[2172,"TOWING CABLE 10 MM \u00d7 13 FT",2490.0],[2173,"TRAVEL ADEPTER 13A",110.0],[2174,"TRAVEL ADEPTER 5A",110.0],[2175,"TRIMMER BOBBIN RED",475.0],[2176,"TRIMMER DISC",390.0],[2177,"TRIMMER LINE 2.0 MM - ROUND",null],[2178,"TRIMMER LINE 2.0 SQUARE",290.0],[2179,"TRIMMER LINE 2.4 - ROUND",null],[2180,"TRIMMER LINE 3.0 - SQUARE",375.0],[2181,"TRIMMER LINE 3.5 - ROUND",375.0],[2182,"TRIMMER LINE 3.5 - SQUARE",400.0],[2183,"TRIMMER LINE 4MM - ROUND",510.0],[2184,"TRIMMER LINE 4MM - SQUARE",510.0],[2185,"TRIPLE SHELF MIRROR WITH LIGHT - 2",5350.0],[2186,"TRIPLE SHELF MIRROR WITH LIGHT - DMS 02",null],[2187,"TRIPLE SHELF MIRROR WITH LIGHT - DMS 03",4995.0],[2188,"TRIPLE SHELF MIRROR WITH LIGHT - DMS 04",4995.0],[2189,"TRIPLE SHELF MIRROR WITH LIGHT - DMS 05",4995.0],[2190,"TRIPLE SHELF MIRROR WITH LIGHT - DMS 07",5150.0],[2191,"TRIPLE SHELF MIRROR WITH LIGHT - DMS 08",4995.0],[2192,"TRY SQUARE 08\"",3300.0],[2193,"TRY SQUARE 10\"",3480.0],[2194,"TRY SQUARE 12\"",3600.0],[2195,"TT WIRE",22390.0],[2196,"TT WIRE - 100M",2550.0],[2197,"TURBO CUTTING WHEEL 4 1/2\"",450.0],[2198,"TURBO CUTTING WHEEL 4\"",425.0],[2199,"TV BRACKET HD 601",590.0],[2200,"TV BRACKET HD 602 B",875.0],[2201,"TV BRACKET HDL 117B",1350.0],[2202,"TV BRACKET HDL 117B-02",1450.0],[2203,"TV BRACKET HEAVY P4 CANTILEVER",2800.0],[2204,"TV BRACKET SH 567",1390.0],[2205,"Tyre Inflator Guage",1950.0],[2206,"TYRE WELD NAVISS SPRAY",950.0],[2207,"UK CISTERN FITTING",750.0],[2208,"UMBRELLA NAIL 1 1/2\"",2275.0],[2209,"UMBRELLA NAIL 2\"",2275.0],[2210,"UMBRELLA POP WASTE BRASS RMR (2141)",2250.0],[2211,"UNDER BALL VALVE CUP (1161)",275.0],[2212,"UNION PVC 1 1/2\"",665.0],[2213,"UNION PVC 1 1/4\"",null],[2214,"UNION PVC 1/2\"",195.0],[2215,"UNION PVC 2\"",null],[2216,"UNIT WALL BRACKET",3.0],[2217,"UNIVERSAL WRENCH",1475.0],[2218,"URINAL RMR (2291)",17500.0],[2219,"URINAL RMR (2292)",13250.0],[2220,"URINAL RMR (2293)",16000.0],[2221,"URINAL RMR (2423)",27000.0],[2222,"VANITY BASIN CRM SQUARE (2539)",15000.0],[2223,"VANITY BASIN CRMB RMR 201 (2222)",17500.0],[2224,"VANITY BASIN GOLD LINE RMR (2327)",27500.0],[2225,"VANITY BASIN RMR (2030)",22500.0],[2226,"VANITY BASIN RMR (2280)",15500.0],[2227,"VANITY BASIN RMR (2328)",27500.0],[2228,"VANITY BASINCRM 218 RMR (2027)",17500.0],[2229,"VENTILATING FAN 2WAY 10\" AKKO STAR",6300.0],[2230,"VENTILATING FAN 2WAY 12\" AKKO STAR",7350.0],[2231,"VENTILATING FAN 2WAY 6\" AKKO STAR",5700.0],[2232,"VENUS BALL VALVE 1/2 INCH",null],[2233,"VENUS SS SINK TAP",1450.0],[2234,"VOC SMART COMMED - VS",190000.0],[2235,"VOC URINAL WALL MOUNTED CERAMIC - (503)",18500.0],[2236,"WALL ANGLE",180.0],[2237,"WALL ANGLE TEAK",200.0],[2238,"WALL MOUNTE FAN 4\" AKKO STAR",2900.0],[2239,"WALL MOUNTE FAN 6\" AKKO STAR",3750.0],[2240,"WALL PLUG 05",95.0],[2241,"WALL PLUG 06",110.0],[2242,"WALL PLUG 07",125.0],[2243,"WALL PLUG 08",140.0],[2244,"WALL PLUG 10",160.0],[2245,"WALL PLUG 12",180.0],[2246,"WASH BASIN MAT BLACK AS (C02)",25500.0],[2247,"WASH BASIN ROUND (1282)",14500.0],[2248,"WASH BASIN ROUND (2472)",16500.0],[2249,"WASH BASIN SQUARE (2223)",17000.0],[2250,"WASH BASIN SQUARE (2229)",17250.0],[2251,"WASH BASIN SQUARE (2287)",16750.0],[2252,"WASH BASIN SQUARE (2471)",17000.0],[2253,"WASHING MACHINE HOSE INLET - INDIA",325.0],[2254,"WASHING MACHINE HOSE INLET 1.5M - INDIA",375.0],[2255,"WASHING MACHINE HOSE INLET 2M - INDIA",375.0],[2256,"WASHING MACHINE HOSE INLET GRAY HEAVY",450.0],[2257,"WASHING MACHINE HOSE OUTLET 1.5M - INDIA",460.0],[2258,"WASHING MACHINE HOSE OUTLET 1.5M - WHITE",395.0],[2259,"WASHING MACHINE HOSE OUTLET 2M - CHINA",550.0],[2260,"WASHING MACHINE OUTLET HOSE 1.5M CHINA",450.0],[2261,"WASHING MACHINE OUTLET HOSE WITH BEND GRAY 1.5M (2493)",595.0],[2262,"WATER FILTER DOUBLE (2612)",7800.0],[2263,"WATER METER",null],[2264,"WATER PROOF ADHESIVE 300GM",960.0],[2265,"WATER PROOF SPRAY 450ML",1100.0],[2266,"WATER SAND PAPER (120)",35.0],[2267,"WATER SAND PAPER (320)",35.0],[2268,"WATER SAND PAPER (80)",35.0],[2269,"WATER SAND PAPER 280",35.0],[2270,"WATER SAND PAPER (40)",45.0],[2271,"WATER SAND PAPER (60)",35.0],[2272,"WATER TANK ROUND BUTTON - (1629)",null],[2273,"WATER TANK SQUARE BUTTON - (1630)",null],[2274,"WATERPROOF TAPE - BUTYL",750.0],[2275,"WATERPROOF TAPE 5MTR",750.0],[2276,"WELCO PAD 4 1/2\"",195.0],[2277,"WELCO PAD 4\"",150.0],[2278,"WELCO PAPER 4\" 60",14.0],[2279,"WELCO PAPER 4\" ASSOTED",14.0],[2280,"WELCO PAPER 4 1/2\" #100",16.0],[2281,"WELCO PAPER 4 1/2\" #120",16.0],[2282,"WELCO PAPER 4 1/2\" #40",16.0],[2283,"WELCO PAPER 4 1/2\" #60",16.0],[2284,"WELCO PAPER 4 1/2\" #80",16.0],[2285,"WELCO PAPER 4 1/2\" ASSOTED",18.0],[2286,"WELCO PAPER 4\" #100",14.0],[2287,"WELCO PAPER 4\" #120",14.0],[2288,"WELCO PAPER 4\" #40",14.0],[2289,"WELCO PAPER 4\" #60",14.0],[2290,"WELCO PAPER 4\" #80",14.0],[2291,"WELCO PAPER 60",null],[2292,"WELCOME HANDLE",156.0],[2293,"WELDED MESH GI 2\" \u00d7 2\" - 2M \u00d7 7.5M",12900.0],[2294,"WELDING GLASS",62.0],[2295,"WELDING HAND SHIELD",350.0],[2296,"WELDING HEAD SHIELD",null],[2297,"WELDING HELMET AUTO DARKENING",4250.0],[2298,"WELDING HOLDER 200A",650.0],[2299,"WELDING HOLDER 300A",650.0],[2300,"WELDING HOLDER 500A",800.0],[2301,"WELDING HOLDER 600A",875.0],[2302,"WELDING HOLDER 800A",975.0],[2303,"WELDING MAGNET - 3\"",550.0],[2304,"WELDING MAGNET - 4\"",null],[2305,"WELDING MAGNET 5\"",1150.0],[2306,"WELDING MAGNET SET 6 PCS",2650.0],[2307,"WELDING ROD IRON NO #12",8800.0],[2308,"WESDA 6*6 GULLY COVER",675.0],[2309,"WESDA COURT HOOKS - DOUBLE (1394)",390.0],[2310,"WESDA COURT HOOKS SINGLE (1401)",375.0],[2311,"WESDA GLASS SHELF STEEL 400MM (1391)",1050.0],[2312,"WESDA GLASS SOAP DISH WITH HOLDER SQUARE (2035)",1650.0],[2313,"WESDA GRAB BAR 30CM (1640)",1090.0],[2314,"WESDA GRAB BAR 40CM (1641)",1190.0],[2315,"WESDA GRAB BAR 50CM (1644)",1290.0],[2316,"WESDA GULLY COVER (1406)",690.0],[2317,"WESDA HEAVY SHELF STEEL 500MM (1398)",2250.0],[2318,"WESDA PAPER HOLDER (1400)",775.0],[2319,"WESDA PAPER HOLDER FULL COVER - HEAVY (1842)",1190.0],[2320,"WESDA SOAP DISH BLACK - MEDIUM (2337)",980.0],[2321,"WESDA SOAP DISH BLACK - SINGLE (2335)",690.0],[2322,"WESDA STRAIGHT SHELF - DOUBLE (1658)",2950.0],[2323,"WESDA STRAIGHT SHELF - SINGLE (2010)",1750.0],[2324,"WESDA TOWEL RING - ROUND (1648)",1050.0],[2325,"WESDA TOWEL RING - SQUARE (1649)",1550.0],[2326,"WHEEL BARROW BUCKET - CHINA",3100.0],[2327,"WHEEL BARROW TYRE - CHINA",2150.0],[2328,"WHITE ROUND COMMED SEAT COVER S/D HEAVY (1094)",2690.0],[2329,"WHITE SQUARE COMMED SEAT COVER S/D HEAVY (1970)",3290.0],[2330,"WINDOW CASEMENT SGL SQUARE",1250.0],[2331,"WINDOW CASEMENT SS SQUARE",1275.0],[2332,"WINDOW FASTNER OXFORD LEFT",245.0],[2333,"WINDOW FASTNER OXFORD RIGHT",245.0],[2334,"WINDOW FASTNER SGL SQUARE",860.0],[2335,"WINDOW FASTNER SS SQUARE",895.0],[2336,"WINDOW RING OXFORD",145.0],[2337,"WINDOW RING ROUND BRASS",null],[2338,"WINDOW RING ROUND SGL",260.0],[2339,"WINDOW RING SQUARE BRASS",null],[2340,"WINDOW RING SQUARE SGL",260.0],[2341,"WINDOW RING SQUARE SS",260.0],[2342,"WIRE BRUSH 3 PCS - SMALL",725.0],[2343,"WIRE BRUSH 4R PLASTIC HANDLE",2100.0],[2344,"WIRE BRUSH 4R WOOD HANDLE",2100.0],[2345,"WIRE BRUSH 5R PLASTIC HANDLE",2220.0],[2346,"WIRE BRUSH 5R WOOD HANDLE",2220.0],[2347,"WIRE BRUSH 6R PLASTIC HANDLE",2340.0],[2348,"WIRE BRUSH 6R WOOD HANDLE",2340.0],[2349,"WIRE BRUSH WITH SCRAPER - 5",270.0],[2350,"WIRE BRUSH WITH SCRAPER - 6",275.0],[2351,"WIRE CORD 6WAY - 3MTR",2295.0],[2352,"WIRE CORD EXTENSION 3WAY BONEX",1850.0],[2353,"WIRE CORD EXTENSION 4WAY BONEX",1950.0],[2354,"WIRE CORD EXTENSION 5WAY BONEX",1150.0],[2355,"WIRE CORD GELISTER - 5 WAY",2350.0],[2356,"WIRE CORD GELISTER 3M - 3 WAY",null],[2357,"WIRE CORD GELISTER 3M - 4 WAY",null],[2358,"WIRE CORD GK 3 WAY - 3MTR",2000.0],[2359,"WIRE CORD GK 3 WAY - 5MTR",2050.0],[2360,"WIRE CORD GK 4 WAY - 3MTR",2200.0],[2361,"WIRE CORD GK 5 WAY - 3MTR",2200.0],[2362,"WIRE CORD MARKEN 3M - 3WAY",1890.0],[2363,"WIRE CORD MARKEN 3M - 4WAY",2000.0],[2364,"WIRE CORD MARKEN 3M - 5WAY",2100.0],[2365,"WIRE CORD MARKEN USB 3M - 6WAY",2450.0],[2366,"WIRE CORD MARKEN USB 5M - 3WAY",1890.0],[2367,"WIRE CORD MARKEN USB 5M - 4WAY",2000.0],[2368,"WIRE CORD MARKEN USB 5M - 5WAY",2100.0],[2369,"WIRE CORD OPK EDITION 6WAY 3MTR",2350.0],[2370,"WIRE CORD OPK EDITION 8WAY 3MTR",2450.0],[2371,"WIRE STRIPPER AUTOMATIC",725.0],[2372,"WIRELESS DOOR BELL AKKO STAR",4300.0],[2373,"WOOD BIT 10MM",175.0],[2374,"WOOD BIT 12MM",190.0],[2375,"WOOD BIT 14MM",195.0],[2376,"WOOD BIT 16MM",215.0],[2377,"WOOD BIT 18MM",225.0],[2378,"WOOD BIT 20MM",245.0],[2379,"WOOD BIT 6 PCS",850.0],[2380,"WOOD CARVING 12PCS SET",2985.0],[2381,"WOOD CARVING 3 PCS",295.0],[2382,"WOOD CARVING 3 PCS SET",295.0],[2383,"WOOD CARVING 6 PCS",925.0],[2384,"WOOD CARVING 6 PCS SET",925.0],[2385,"WOOD CARVING DISC 4\"",null],[2386,"WOOD CHISEL 1\"",380.0],[2387,"WOOD CHISEL 1/2\"",320.0],[2388,"WOOD CHISEL 3/4\"",340.0],[2389,"WOOD CUTTING WHEEL 10\"",null],[2390,"WOOD CUTTING WHEEL 4 1/2\"",385.0],[2391,"WOOD CUTTING WHEEL 4\"",340.0],[2392,"WOOD CUTTING WHEEL 7\"",850.0],[2393,"WOOD FIX GLUE 500G",445.0],[2394,"WOOL BUFFING PAD 4 1/2\"",775.0],[2395,"WOOL BUFFING PAD 7\"",1100.0],[2396,"WOVEN MESH #6 1M*15M",null],[2397,"WOVEN MESH #8 1M*15M",null],[2398,"WRECKING BAR 1 1/2 FT",985.0],[2399,"WRECKING BAR 2FT",1175.0],[2400,"WRECKING BAR 3 FT",1450.0],[2401,"WRENCH UNIVERSAL TORX",null],[2402,"YELLOW POWDER 500G",895.0]];
 
+/* ============================= STATE & STORAGE ============================= */
+
 const state = {
-  order: {}, // sr -> qty
+  order: {},           // sr -> qty
+  discount: { type: 'percent', value: 0 },
+  overrides: {},        // sr -> {price, buyRate, unit}
+  customProducts: [],   // array of {sr, name, price, buyRate, unit}
+  history: [],          // completed orders
+  editingSr: null,       // sr currently open in the product modal (null = adding new)
 };
 
-function loadOrder(){
-  try{
-    const raw = localStorage.getItem('mbm_order');
-    if(raw) state.order = JSON.parse(raw);
-  }catch(e){}
+function loadAll(){
+  try{ const raw = localStorage.getItem('mbm_order'); if(raw) state.order = JSON.parse(raw); }catch(e){}
+  try{ const raw = localStorage.getItem('mbm_discount'); if(raw) state.discount = JSON.parse(raw); }catch(e){}
+  try{ const raw = localStorage.getItem('mbm_product_overrides'); if(raw) state.overrides = JSON.parse(raw); }catch(e){}
+  try{ const raw = localStorage.getItem('mbm_custom_products'); if(raw) state.customProducts = JSON.parse(raw); }catch(e){}
+  try{ const raw = localStorage.getItem('mbm_order_history'); if(raw) state.history = JSON.parse(raw); }catch(e){}
 }
-function saveOrder(){
-  try{ localStorage.setItem('mbm_order', JSON.stringify(state.order)); }catch(e){}
-}
+function saveOrder(){ try{ localStorage.setItem('mbm_order', JSON.stringify(state.order)); }catch(e){} }
+function saveDiscount(){ try{ localStorage.setItem('mbm_discount', JSON.stringify(state.discount)); }catch(e){} }
+function saveOverrides(){ try{ localStorage.setItem('mbm_product_overrides', JSON.stringify(state.overrides)); }catch(e){} }
+function saveCustomProducts(){ try{ localStorage.setItem('mbm_custom_products', JSON.stringify(state.customProducts)); }catch(e){} }
+function saveHistory(){ try{ localStorage.setItem('mbm_order_history', JSON.stringify(state.history)); }catch(e){} }
 
-const productBySr = {};
-PRODUCTS.forEach(p => { productBySr[p[0]] = p; });
+/* ============================= CATALOG ENGINE ============================= */
+// Merges the built-in price list with any buy-rate/unit/price overrides and
+// any products added through "Add Product" into one lookup, keyed by sr.
+
+let CATALOG = {};      // sr -> {sr, name, price, buyRate, unit, custom:bool}
+let CATALOG_LIST = []; // flat array for searching, in catalog order
+let nextCustomSr = 900001;
+
+function rebuildCatalog(){
+  CATALOG = {};
+  CATALOG_LIST = [];
+
+  PRODUCTS.forEach(p => {
+    const [sr, name, price] = p;
+    const ov = state.overrides[sr] || {};
+    const item = {
+      sr,
+      name,
+      price: (ov.price !== undefined && ov.price !== null) ? ov.price : price,
+      buyRate: (ov.buyRate !== undefined) ? ov.buyRate : null,
+      unit: ov.unit || 'Pcs',
+      custom: false
+    };
+    CATALOG[sr] = item;
+    CATALOG_LIST.push(item);
+  });
+
+  state.customProducts.forEach(cp => {
+    const item = {
+      sr: cp.sr,
+      name: cp.name,
+      price: cp.price,
+      buyRate: (cp.buyRate === undefined) ? null : cp.buyRate,
+      unit: cp.unit || 'Pcs',
+      custom: true
+    };
+    CATALOG[cp.sr] = item;
+    CATALOG_LIST.push(item);
+    if(cp.sr >= nextCustomSr) nextCustomSr = cp.sr + 1;
+  });
+}
 
 function fmtMoney(n){
   return 'Rs ' + n.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function fmtSr(sr){
-  return String(sr).padStart(4,'0');
+  const s = String(sr);
+  return s.length < 4 ? s.padStart(4,'0') : s;
 }
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ============================= SEARCH & RESULTS ============================= */
 
 const searchInput = document.getElementById('searchInput');
 const resultsArea = document.getElementById('resultsArea');
@@ -582,21 +927,19 @@ function search(query){
   const isNumeric = /^\d+$/.test(q);
   let matches = [];
   if(isNumeric){
-    // exact sr match first, then substring matches on name
-    const exact = productBySr[parseInt(q,10)];
-    matches = PRODUCTS.filter(p => normalize(p[1]).includes(qUpper) || String(p[0]) === q);
+    const exact = CATALOG[parseInt(q,10)];
+    matches = CATALOG_LIST.filter(p => normalize(p.name).includes(qUpper) || String(p.sr) === q);
     if(exact){
-      matches = matches.filter(p => p[0] !== exact[0]);
+      matches = matches.filter(p => p.sr !== exact.sr);
       matches.unshift(exact);
     }
   } else {
-    matches = PRODUCTS.filter(p => normalize(p[1]).includes(qUpper));
-    // sort: matches where name starts with query first
+    matches = CATALOG_LIST.filter(p => normalize(p.name).includes(qUpper));
     matches.sort((a,b) => {
-      const aStarts = normalize(a[1]).startsWith(qUpper) ? 0 : 1;
-      const bStarts = normalize(b[1]).startsWith(qUpper) ? 0 : 1;
+      const aStarts = normalize(a.name).startsWith(qUpper) ? 0 : 1;
+      const bStarts = normalize(b.name).startsWith(qUpper) ? 0 : 1;
       if(aStarts !== bStarts) return aStarts - bStarts;
-      return a[1].length - b[1].length;
+      return a.name.length - b.name.length;
     });
   }
   return {matches, showEmpty:false};
@@ -615,7 +958,6 @@ function setQty(sr, qty){
   }
   saveOrder();
   renderTicket();
-  // update just the affected row(s) without full re-render for smoothness
   document.querySelectorAll('.result-row[data-sr="'+sr+'"]').forEach(row=>{
     const input = row.querySelector('.qty-input');
     if(input) input.value = qty;
@@ -632,14 +974,14 @@ function renderResults(){
       <div class="empty-state">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <h2>Start typing to search the price list</h2>
-        <p>Search 2,402 items by product name, or type a Sr. No. to jump straight to it.</p>
+        <p>Search by product name, or type a Sr. No. to jump straight to it. Use "+ Add Product" above for anything not in the list.</p>
       </div>`;
     searchHint.textContent = '';
     return;
   }
 
   if(matches.length === 0){
-    resultsArea.innerHTML = `<div class="results"><div class="no-results">No products match that search. Try a shorter or different term.</div></div>`;
+    resultsArea.innerHTML = `<div class="results"><div class="no-results">No products match that search. Try a shorter term, or use "+ Add Product" above to add it.</div></div>`;
     searchHint.textContent = '';
     return;
   }
@@ -651,16 +993,20 @@ function renderResults(){
   const shown = matches.slice(0, MAX_RESULTS);
 
   const rows = shown.map(p => {
-    const [sr, name, price] = p;
+    const { sr, name, price, unit, custom } = p;
     const qty = qtyFor(sr);
-    const priceHtml = price === null
+    const priceHtml = price === null || price === undefined
       ? `<div class="r-price no-price mono">Call for price</div>`
       : `<div class="r-price mono">${fmtMoney(price)}</div>`;
-    const disabled = price === null ? 'disabled' : '';
+    const disabled = (price === null || price === undefined) ? 'disabled' : '';
     return `
       <div class="result-row ${qty>0?'in-order':''}" data-sr="${sr}">
         <div class="r-sr mono">#${fmtSr(sr)}</div>
-        <div class="r-name">${escapeHtml(name)}</div>
+        <div class="r-name">
+          <div class="r-name-text">${escapeHtml(name)}</div>
+          <div class="r-name-meta"><span class="unit-tag">${escapeHtml(unit)}</span>${custom ? ' · added by you' : ''}</div>
+        </div>
+        <button class="r-edit" onclick="openProductModal(${sr})" aria-label="Edit product" title="Edit">&#9998;</button>
         ${priceHtml}
         <div class="stepper">
           <button class="minus" ${disabled} onclick="setQty(${sr}, qtyFor(${sr})-1)" aria-label="Decrease quantity">−</button>
@@ -677,7 +1023,7 @@ function renderResults(){
 
   resultsArea.innerHTML = `
     <div class="col-headers">
-      <div>SR#</div><div>PRODUCT</div><div class="ch-price">PRICE</div><div class="ch-qty">QTY</div>
+      <div>SR#</div><div>PRODUCT</div><div></div><div class="ch-price">PRICE</div><div class="ch-qty">QTY</div>
     </div>
     <div class="results">
       ${rows}
@@ -685,45 +1031,53 @@ function renderResults(){
     </div>`;
 }
 
-function escapeHtml(s){
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+/* ============================= ORDER / DISCOUNT / TICKET ============================= */
 
 function orderLines(){
   return Object.keys(state.order)
     .map(sr => parseInt(sr,10))
-    .map(sr => ({sr, qty: state.order[sr], product: productBySr[sr]}))
+    .map(sr => ({sr, qty: state.order[sr], product: CATALOG[sr]}))
     .filter(l => l.product)
     .sort((a,b) => a.sr - b.sr);
 }
 
 function computeTotals(){
   const lines = orderLines();
-  let total = 0;
+  let subtotal = 0;
   let itemCount = 0;
   let unpriced = 0;
   lines.forEach(l => {
     itemCount += l.qty;
-    const price = l.product[2];
-    if(price === null){ unpriced += 1; }
-    else { total += price * l.qty; }
+    const price = l.product.price;
+    if(price === null || price === undefined){ unpriced += 1; }
+    else { subtotal += price * l.qty; }
   });
-  return {lines, total, itemCount, unpriced};
+  let discountAmount = 0;
+  if(state.discount.value > 0){
+    if(state.discount.type === 'percent'){
+      discountAmount = subtotal * (state.discount.value / 100);
+    } else {
+      discountAmount = state.discount.value;
+    }
+  }
+  discountAmount = Math.max(0, Math.min(discountAmount, subtotal));
+  const total = subtotal - discountAmount;
+  return {lines, subtotal, discountAmount, total, itemCount, unpriced};
 }
 
 function ticketHtml(){
-  const {lines, total, itemCount, unpriced} = computeTotals();
+  const {lines, subtotal, discountAmount, total, itemCount, unpriced} = computeTotals();
 
   const linesHtml = lines.length === 0
     ? `<div class="ticket-empty">No items yet.<br>Use the +/− steppers to add products from the price list.</div>`
     : lines.map(l => {
-        const [sr, name, price] = l.product;
-        const lineTotal = price === null ? null : price * l.qty;
+        const { sr, name, price, unit } = l.product;
+        const lineTotal = (price === null || price === undefined) ? null : price * l.qty;
         return `
           <div class="ticket-line">
             <div class="tl-main">
               <div class="tl-name">${escapeHtml(name)}</div>
-              <div class="tl-meta">#${fmtSr(sr)} · ${price===null?'no price':fmtMoney(price)} × ${l.qty}</div>
+              <div class="tl-meta">#${fmtSr(sr)} · ${price===null?'no price':fmtMoney(price)} × ${l.qty} ${escapeHtml(unit)}</div>
             </div>
             <div style="display:flex;align-items:flex-start;gap:2px;">
               <div class="tl-total">${lineTotal===null?'—':fmtMoney(lineTotal)}</div>
@@ -743,15 +1097,27 @@ function ticketHtml(){
     </div>
     <div class="ticket-lines">${linesHtml}</div>
     <div class="ticket-summary">
+      <div class="sum-row"><span>Subtotal</span><span class="mono">${fmtMoney(subtotal)}</span></div>
+      <div class="sum-row discount-row">
+        <span>Discount</span>
+        <span style="display:flex;align-items:center;gap:4px;">
+          <input type="number" id="discountValue" min="0" step="0.01" value="${state.discount.value || 0}" onchange="setDiscountValue(this.value)">
+          <select id="discountType" onchange="setDiscountType(this.value)">
+            <option value="percent" ${state.discount.type==='percent'?'selected':''}>%</option>
+            <option value="flat" ${state.discount.type==='flat'?'selected':''}>Rs</option>
+          </select>
+        </span>
+      </div>
+      ${discountAmount>0 ? `<div class="sum-row"><span>Discount applied</span><span class="mono">− ${fmtMoney(discountAmount)}</span></div>` : ''}
       <div class="sum-row total"><span>Total</span><span class="mono">${fmtMoney(total)}</span></div>
       ${unpricedNote}
     </div>
     <div class="ticket-actions">
       <button onclick="copyOrder()">Copy</button>
       <button onclick="downloadInvoice()">Download</button>
-      <button class="primary full" onclick="copyOrder()">Copy order to clipboard</button>
+      <button class="complete full" onclick="completeOrder()">Complete Order &#10003;</button>
     </div>
-    <div class="clear-row"><button onclick="clearOrder()">Clear entire order</button></div>
+    <div class="clear-row"><button onclick="clearOrder()">Clear entire order (without saving)</button></div>
   `;
 }
 
@@ -759,6 +1125,20 @@ function renderTicket(){
   const html = ticketHtml();
   document.getElementById('ticketDesktop').innerHTML = html;
   document.getElementById('ticketMobile').innerHTML = html;
+}
+
+function setDiscountValue(v){
+  const num = Math.max(0, parseFloat(v) || 0);
+  state.discount.value = num;
+  saveDiscount();
+  renderTicket();
+  updateMobileBar();
+}
+function setDiscountType(t){
+  state.discount.type = (t === 'flat') ? 'flat' : 'percent';
+  saveDiscount();
+  renderTicket();
+  updateMobileBar();
 }
 
 function updateMobileBar(){
@@ -771,9 +1151,11 @@ function updateMobileBar(){
 
 function clearOrder(){
   if(Object.keys(state.order).length === 0) return;
-  showConfirm('Clear all items from the current order?', () => {
+  showConfirm('Clear all items from the current order? This will NOT be saved to the report.', () => {
     state.order = {};
+    state.discount = { type: 'percent', value: 0 };
     saveOrder();
+    saveDiscount();
     renderResults();
     renderTicket();
     updateMobileBar();
@@ -781,54 +1163,67 @@ function clearOrder(){
   });
 }
 
-function showConfirm(message, onConfirm){
-  let overlay = document.getElementById('confirmOverlay');
-  if(!overlay){
-    overlay = document.createElement('div');
-    overlay.id = 'confirmOverlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,31,34,0.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;';
-    overlay.innerHTML = `
-      <div style="background:#FFFFFF;border-radius:6px;max-width:340px;width:100%;padding:20px;font-family:Archivo,sans-serif;box-shadow:0 12px 30px rgba(0,0,0,.3);">
-        <p id="confirmMsg" style="margin:0 0 18px 0;font-size:0.95rem;color:#1C1F22;font-weight:600;line-height:1.4;"></p>
-        <div style="display:flex;gap:8px;justify-content:flex-end;">
-          <button id="confirmCancelBtn" style="font-family:Archivo,sans-serif;font-weight:700;font-size:0.82rem;padding:9px 14px;border-radius:3px;cursor:pointer;border:2px solid #1C1F22;background:#FFFFFF;color:#1C1F22;">Cancel</button>
-          <button id="confirmOkBtn" style="font-family:Archivo,sans-serif;font-weight:700;font-size:0.82rem;padding:9px 14px;border-radius:3px;cursor:pointer;border:2px solid #C1432A;background:#C1432A;color:#FFFFFF;">Clear order</button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
+function completeOrder(){
+  const {lines, subtotal, discountAmount, total, itemCount, unpriced} = computeTotals();
+  if(lines.length === 0){
+    flashMessage('Add items to the order first');
+    return;
   }
-  document.getElementById('confirmMsg').textContent = message;
-  overlay.style.display = 'flex';
+  const record = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    lines: lines.map(l => ({
+      sr: l.sr,
+      name: l.product.name,
+      unit: l.product.unit,
+      qty: l.qty,
+      price: l.product.price,
+      lineTotal: (l.product.price===null||l.product.price===undefined) ? null : l.product.price * l.qty
+    })),
+    subtotal, discountType: state.discount.type, discountValue: state.discount.value,
+    discountAmount, total, itemCount, unpriced
+  };
+  state.history.unshift(record);
+  saveHistory();
 
-  const cancelBtn = document.getElementById('confirmCancelBtn');
-  const okBtn = document.getElementById('confirmOkBtn');
-  const cleanup = () => { overlay.style.display = 'none'; };
-  cancelBtn.onclick = cleanup;
-  overlay.onclick = (e) => { if(e.target === overlay) cleanup(); };
-  okBtn.onclick = () => { cleanup(); onConfirm(); };
+  state.order = {};
+  state.discount = { type: 'percent', value: 0 };
+  saveOrder();
+  saveDiscount();
+  renderResults();
+  renderTicket();
+  updateMobileBar();
+  flashMessage('Order completed and saved to Report');
+  closeSheet();
 }
 
+/* ============================= COPY / PDF ============================= */
+
 function buildOrderText(){
-  const {lines, total, unpriced} = computeTotals();
+  const {lines, subtotal, discountAmount, total, unpriced} = computeTotals();
   if(lines.length === 0) return 'No items in order.';
   const rows = lines.map(l => {
-    const [sr, name, price] = l.product;
-    const lineTotal = price === null ? '-' : (price * l.qty).toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2});
-    const unit = price === null ? '-' : price.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2});
-    return `#${fmtSr(sr)}  ${name}  x${l.qty}  @ ${unit}  = ${lineTotal}`;
+    const { sr, name, price, unit } = l.product;
+    const lineTotal = (price===null||price===undefined) ? '-' : (price * l.qty).toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const unitPrice = (price===null||price===undefined) ? '-' : price.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2});
+    return `#${fmtSr(sr)}  ${name}  x${l.qty} ${unit}  @ ${unitPrice}  = ${lineTotal}`;
   });
-  const lines2 = [
+  const out = [
     'MBM (PVT) LTD — Order Ticket',
     new Date().toLocaleString(),
     '--------------------------------------',
     ...rows,
     '--------------------------------------',
-    `TOTAL: Rs ${total.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2})}`
+    `Subtotal: Rs ${subtotal.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2})}`
   ];
-  if(unpriced > 0){
-    lines2.push(`(${unpriced} item(s) excluded — no listed price)`);
+  if(discountAmount > 0){
+    out.push(`Discount: - Rs ${discountAmount.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2})}`);
   }
-  return lines2.join('\n');
+  out.push(`TOTAL: Rs ${total.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2})}`);
+  if(unpriced > 0){
+    out.push(`(${unpriced} item(s) excluded — no listed price)`);
+  }
+  return out.join('\n');
 }
 
 function copyOrder(){
@@ -837,8 +1232,6 @@ function copyOrder(){
 }
 
 function copyTextToClipboard(text){
-  // Try the modern Clipboard API first, but only when it's actually usable —
-  // it silently fails or throws in sandboxed/embedded views.
   try{
     if(navigator.clipboard && window.isSecureContext){
       navigator.clipboard.writeText(text).then(()=>{
@@ -848,7 +1241,7 @@ function copyTextToClipboard(text){
       });
       return;
     }
-  }catch(e){ /* fall through to legacy method */ }
+  }catch(e){ /* fall through */ }
   legacyCopy(text);
 }
 
@@ -864,11 +1257,8 @@ function legacyCopy(text){
     ta.setSelectionRange(0, text.length);
     const ok = document.execCommand('copy');
     document.body.removeChild(ta);
-    if(ok){
-      flashMessage('Order copied to clipboard');
-    } else {
-      showCopyFallback(text);
-    }
+    if(ok){ flashMessage('Order copied to clipboard'); }
+    else { showCopyFallback(text); }
   }catch(e){
     showCopyFallback(text);
   }
@@ -879,7 +1269,7 @@ function showCopyFallback(text){
   if(!overlay){
     overlay = document.createElement('div');
     overlay.id = 'copyFallbackOverlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,31,34,0.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,31,34,0.55);z-index:220;display:flex;align-items:center;justify-content:center;padding:20px;';
     overlay.innerHTML = `
       <div style="background:#FFFFFF;border-radius:6px;max-width:420px;width:100%;padding:20px;font-family:Archivo,sans-serif;box-shadow:0 12px 30px rgba(0,0,0,.3);">
         <p style="margin:0 0 10px 0;font-size:0.9rem;color:#1C1F22;font-weight:700;">Couldn't copy automatically</p>
@@ -900,7 +1290,7 @@ function showCopyFallback(text){
 }
 
 function downloadInvoice(){
-  const {lines, total, unpriced} = computeTotals();
+  const {lines, subtotal, discountAmount, total, unpriced} = computeTotals();
   if(lines.length === 0){
     flashMessage('Add items to the order before downloading an invoice');
     return;
@@ -923,37 +1313,47 @@ function downloadInvoice(){
   doc.setTextColor(0);
 
   const body = lines.map(l => {
-    const [sr, name, price] = l.product;
-    const unit = price === null ? '—' : price.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2});
-    const lineTotal = price === null ? '—' : (price * l.qty).toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2});
-    return [fmtSr(sr), name, String(l.qty), unit, lineTotal];
+    const { sr, name, price, unit } = l.product;
+    const unitPrice = (price===null||price===undefined) ? '—' : price.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const lineTotal = (price===null||price===undefined) ? '—' : (price * l.qty).toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2});
+    return [fmtSr(sr), name, String(l.qty), unit, unitPrice, lineTotal];
   });
 
   doc.autoTable({
     startY: 36,
-    head: [['Sr#', 'Product', 'Qty', 'Unit Price', 'Total']],
+    head: [['Sr#', 'Product', 'Qty', 'Unit', 'Unit Price', 'Total']],
     body: body,
     styles: { fontSize: 9, cellPadding: 3 },
     headStyles: { fillColor: [28, 31, 34], textColor: [242, 183, 5] },
     columnStyles: {
       0: { cellWidth: 16 },
-      2: { cellWidth: 14, halign: 'center' },
-      3: { cellWidth: 26, halign: 'right' },
-      4: { cellWidth: 26, halign: 'right' }
+      2: { cellWidth: 12, halign: 'center' },
+      3: { cellWidth: 16, halign: 'center' },
+      4: { cellWidth: 24, halign: 'right' },
+      5: { cellWidth: 24, halign: 'right' }
     },
     margin: { left: 14, right: 14 }
   });
 
-  const finalY = doc.lastAutoTable.finalY + 10;
+  let y = doc.lastAutoTable.finalY + 8;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text('Subtotal: ' + fmtMoney(subtotal), 196, y, { align: 'right' });
+  if(discountAmount > 0){
+    y += 6;
+    doc.text('Discount: - ' + fmtMoney(discountAmount), 196, y, { align: 'right' });
+  }
+  y += 8;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.text('TOTAL: ' + fmtMoney(total), 196, finalY, { align: 'right' });
+  doc.text('TOTAL: ' + fmtMoney(total), 196, y, { align: 'right' });
 
   if(unpriced > 0){
+    y += 8;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(120);
-    doc.text(unpriced + ' item(s) excluded — no listed price.', 14, finalY + 8);
+    doc.text(unpriced + ' item(s) excluded — no listed price.', 14, y);
     doc.setTextColor(0);
   }
 
@@ -961,13 +1361,252 @@ function downloadInvoice(){
   doc.save(filename);
   flashMessage('Invoice downloaded');
 }
+
+/* ============================= ADD / EDIT PRODUCT ============================= */
+
+function openProductModal(sr){
+  state.editingSr = sr || null;
+  const overlay = document.getElementById('productModalOverlay');
+  const title = document.getElementById('productModalTitle');
+  const nameEl = document.getElementById('pmName');
+  const priceEl = document.getElementById('pmPrice');
+  const buyRateEl = document.getElementById('pmBuyRate');
+  const unitEl = document.getElementById('pmUnit');
+  const unitOtherEl = document.getElementById('pmUnitOther');
+  const leftActions = document.getElementById('pmLeftActions');
+  leftActions.innerHTML = '';
+
+  if(sr){
+    const item = CATALOG[sr];
+    title.textContent = 'Edit Product #' + fmtSr(sr);
+    nameEl.value = item.name;
+    priceEl.value = (item.price===null||item.price===undefined) ? '' : item.price;
+    buyRateEl.value = (item.buyRate===null||item.buyRate===undefined) ? '' : item.buyRate;
+    setUnitSelect(item.unit);
+
+    if(item.custom){
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn danger';
+      delBtn.textContent = 'Delete product';
+      delBtn.onclick = () => deleteCustomProduct(sr);
+      leftActions.appendChild(delBtn);
+    } else if(state.overrides[sr]){
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'btn';
+      resetBtn.textContent = 'Reset to default';
+      resetBtn.onclick = () => resetOverride(sr);
+      leftActions.appendChild(resetBtn);
+    }
+  } else {
+    title.textContent = 'Add Product';
+    nameEl.value = '';
+    priceEl.value = '';
+    buyRateEl.value = '';
+    setUnitSelect('Pcs');
+  }
+
+  overlay.classList.add('open');
+  nameEl.focus();
+}
+
+function setUnitSelect(unit){
+  const unitEl = document.getElementById('pmUnit');
+  const unitOtherEl = document.getElementById('pmUnitOther');
+  const known = Array.from(unitEl.options).some(o => o.value === unit);
+  if(known){
+    unitEl.value = unit;
+    unitOtherEl.style.display = 'none';
+    unitOtherEl.value = '';
+  } else {
+    unitEl.value = '__other__';
+    unitOtherEl.style.display = 'block';
+    unitOtherEl.value = unit;
+  }
+}
+
+function closeProductModal(){
+  document.getElementById('productModalOverlay').classList.remove('open');
+  state.editingSr = null;
+}
+
+function saveProductModal(){
+  const name = document.getElementById('pmName').value.trim();
+  const priceRaw = document.getElementById('pmPrice').value;
+  const buyRateRaw = document.getElementById('pmBuyRate').value;
+  const unitSel = document.getElementById('pmUnit').value;
+  const unitOther = document.getElementById('pmUnitOther').value.trim();
+  const unit = (unitSel === '__other__') ? (unitOther || 'Pcs') : unitSel;
+
+  if(!name){
+    flashMessage('Product name is required');
+    return;
+  }
+  if(priceRaw === '' || isNaN(parseFloat(priceRaw))){
+    flashMessage('Enter a valid sale rate');
+    return;
+  }
+  const price = parseFloat(priceRaw);
+  const buyRate = (buyRateRaw === '' || isNaN(parseFloat(buyRateRaw))) ? null : parseFloat(buyRateRaw);
+
+  if(state.editingSr){
+    const sr = state.editingSr;
+    const existing = CATALOG[sr];
+    if(existing.custom){
+      const idx = state.customProducts.findIndex(cp => cp.sr === sr);
+      if(idx >= 0){
+        state.customProducts[idx] = { sr, name, price, buyRate, unit };
+        saveCustomProducts();
+      }
+    } else {
+      state.overrides[sr] = { price, buyRate, unit };
+      saveOverrides();
+    }
+    flashMessage('Product updated');
+  } else {
+    const sr = nextCustomSr++;
+    state.customProducts.push({ sr, name, price, buyRate, unit });
+    saveCustomProducts();
+    flashMessage('Product added');
+    searchInput.value = name;
+  }
+
+  rebuildCatalog();
+  closeProductModal();
+  renderResults();
+  renderTicket();
+}
+
+function deleteCustomProduct(sr){
+  showConfirm('Delete this product? This cannot be undone.', () => {
+    state.customProducts = state.customProducts.filter(cp => cp.sr !== sr);
+    saveCustomProducts();
+    delete state.order[sr];
+    saveOrder();
+    rebuildCatalog();
+    closeProductModal();
+    renderResults();
+    renderTicket();
+    updateMobileBar();
+    flashMessage('Product deleted');
+  });
+}
+
+function resetOverride(sr){
+  delete state.overrides[sr];
+  saveOverrides();
+  rebuildCatalog();
+  closeProductModal();
+  renderResults();
+  flashMessage('Reset to default price list values');
+}
+
+/* ============================= REPORT ============================= */
+
+function openReport(){
+  renderReport();
+  document.getElementById('reportModalOverlay').classList.add('open');
+}
+function closeReport(){
+  document.getElementById('reportModalOverlay').classList.remove('open');
+}
+
+function renderReport(){
+  const bar = document.getElementById('reportSummaryBar');
+  const list = document.getElementById('reportList');
+
+  if(state.history.length === 0){
+    bar.innerHTML = '';
+    list.innerHTML = `<div class="report-empty">No completed orders yet. Orders are saved here when you tap "Complete Order" on the ticket.</div>`;
+    return;
+  }
+
+  const totalRevenue = state.history.reduce((s,r) => s + r.total, 0);
+  bar.innerHTML = `
+    <div><b>${state.history.length}</b> saved order${state.history.length===1?'':'s'}</div>
+    <div>Total: <b>${fmtMoney(totalRevenue)}</b></div>
+    <div style="margin-left:auto;"><button class="btn danger" style="padding:5px 10px;font-size:0.72rem;" onclick="clearHistory()">Clear all report history</button></div>
+  `;
+
+  list.innerHTML = state.history.map(r => {
+    const dateStr = new Date(r.timestamp).toLocaleString();
+    const linesHtml = r.lines.map(l => `
+      <div class="re-line">
+        <div class="re-line-name">#${fmtSr(l.sr)} ${escapeHtml(l.name)}</div>
+        <div class="re-line-meta">${l.qty} ${escapeHtml(l.unit)} × ${l.price===null?'—':fmtMoney(l.price)} = ${l.lineTotal===null?'—':fmtMoney(l.lineTotal)}</div>
+      </div>`).join('');
+    const discountLine = r.discountAmount > 0
+      ? `<div class="re-line"><div class="re-line-name">Discount</div><div class="re-line-meta">− ${fmtMoney(r.discountAmount)}</div></div>`
+      : '';
+    return `
+      <div class="report-entry" id="report-entry-${r.id}">
+        <div class="report-entry-head" onclick="toggleReportEntry(${r.id})">
+          <div>
+            <div class="re-date">${dateStr}</div>
+            <div class="re-meta">${r.itemCount} item${r.itemCount===1?'':'s'}${r.unpriced>0 ? ' · '+r.unpriced+' unpriced' : ''}</div>
+          </div>
+          <div class="re-total mono">${fmtMoney(r.total)}</div>
+        </div>
+        <div class="report-entry-body">
+          ${linesHtml}
+          ${discountLine}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleReportEntry(id){
+  const el = document.getElementById('report-entry-' + id);
+  if(el) el.classList.toggle('expanded');
+}
+
+function clearHistory(){
+  if(state.history.length === 0) return;
+  showConfirm('Clear all saved order report history? This cannot be undone.', () => {
+    state.history = [];
+    saveHistory();
+    renderReport();
+    flashMessage('Report history cleared');
+  });
+}
+
+/* ============================= CONFIRM DIALOG ============================= */
+
+function showConfirm(message, onConfirm){
+  let overlay = document.getElementById('confirmOverlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'confirmOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,31,34,0.55);z-index:250;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML = `
+      <div style="background:#FFFFFF;border-radius:6px;max-width:340px;width:100%;padding:20px;font-family:Archivo,sans-serif;box-shadow:0 12px 30px rgba(0,0,0,.3);">
+        <p id="confirmMsg" style="margin:0 0 18px 0;font-size:0.95rem;color:#1C1F22;font-weight:600;line-height:1.4;"></p>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button id="confirmCancelBtn" style="font-family:Archivo,sans-serif;font-weight:700;font-size:0.82rem;padding:9px 14px;border-radius:3px;cursor:pointer;border:2px solid #1C1F22;background:#FFFFFF;color:#1C1F22;">Cancel</button>
+          <button id="confirmOkBtn" style="font-family:Archivo,sans-serif;font-weight:700;font-size:0.82rem;padding:9px 14px;border-radius:3px;cursor:pointer;border:2px solid #C1432A;background:#C1432A;color:#FFFFFF;">Confirm</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+  document.getElementById('confirmMsg').textContent = message;
+  overlay.style.display = 'flex';
+
+  const cancelBtn = document.getElementById('confirmCancelBtn');
+  const okBtn = document.getElementById('confirmOkBtn');
+  const cleanup = () => { overlay.style.display = 'none'; };
+  cancelBtn.onclick = cleanup;
+  overlay.onclick = (e) => { if(e.target === overlay) cleanup(); };
+  okBtn.onclick = () => { cleanup(); onConfirm(); };
+}
+
+/* ============================= MISC UI ============================= */
+
 let flashTimer;
 function flashMessage(msg){
   let el = document.getElementById('flashMsg');
   if(!el){
     el = document.createElement('div');
     el.id = 'flashMsg';
-    el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1C1F22;color:#F2B705;padding:10px 18px;border-radius:4px;font-family:Archivo,sans-serif;font-weight:700;font-size:0.85rem;z-index:100;box-shadow:0 4px 14px rgba(0,0,0,.25);';
+    el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1C1F22;color:#F2B705;padding:10px 18px;border-radius:4px;font-family:Archivo,sans-serif;font-weight:700;font-size:0.85rem;z-index:300;box-shadow:0 4px 14px rgba(0,0,0,.25);';
     document.body.appendChild(el);
   }
   el.textContent = msg;
@@ -976,7 +1615,6 @@ function flashMessage(msg){
   flashTimer = setTimeout(()=>{ el.style.opacity = '0'; }, 1800);
 }
 
-// events
 let debounceTimer;
 searchInput.addEventListener('input', () => {
   clearTimeout(debounceTimer);
@@ -993,8 +1631,27 @@ function closeSheet(){
   document.getElementById('sheetOverlay').classList.remove('open');
 }
 
-// init
-loadOrder();
+document.getElementById('addProductBtn').addEventListener('click', () => openProductModal(null));
+document.getElementById('productModalClose').addEventListener('click', closeProductModal);
+document.getElementById('pmCancelBtn').addEventListener('click', closeProductModal);
+document.getElementById('pmSaveBtn').addEventListener('click', saveProductModal);
+document.getElementById('productModalOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'productModalOverlay') closeProductModal();
+});
+document.getElementById('pmUnit').addEventListener('change', function(){
+  document.getElementById('pmUnitOther').style.display = (this.value === '__other__') ? 'block' : 'none';
+});
+
+document.getElementById('reportBtn').addEventListener('click', openReport);
+document.getElementById('reportModalClose').addEventListener('click', closeReport);
+document.getElementById('reportModalOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'reportModalOverlay') closeReport();
+});
+
+/* ============================= INIT ============================= */
+
+loadAll();
+rebuildCatalog();
 renderResults();
 renderTicket();
 updateMobileBar();
