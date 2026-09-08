@@ -275,6 +275,46 @@
   .stepper input::-webkit-outer-spin-button,
   .stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
+  /* ---------- Swipe-to-delete (products you've added) ---------- */
+  .swipe-wrap{
+    position:relative;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .swipe-wrap:last-child{border-bottom:none;}
+  .swipe-wrap .swipe-content{
+    border-bottom:none;
+  }
+  .swipe-delete-bg{
+    position:absolute;
+    top:0;right:0;bottom:0;
+    width:90px;
+    background:var(--red);
+    display:flex;
+    align-items:stretch;
+  }
+  .swipe-delete-btn{
+    flex:1;
+    background:none;
+    border:none;
+    color:#fff;
+    font-weight:700;
+    font-size:0.82rem;
+    cursor:pointer;
+  }
+  .swipe-content{
+    position:relative;
+    background:var(--paper);
+    transform:translateX(0);
+    touch-action:pan-y;
+  }
+  .swipe-content.swipe-anim{
+    transition:transform .18s ease;
+  }
+  .swipe-content.open{
+    transform:translateX(-90px);
+  }
+
   .no-results, .empty-state{
     padding:40px 20px;
     text-align:center;
@@ -381,6 +421,30 @@
     font-size:0.75rem;
     color:var(--yellow);
   }
+  .shop-name-row{
+    padding:12px 16px;
+    border-bottom:1px dashed var(--line);
+    background:#FFFBEA;
+  }
+  .shop-name-row label{
+    display:block;
+    font-size:0.7rem;
+    font-weight:700;
+    color:var(--steel);
+    margin-bottom:5px;
+    letter-spacing:0.02em;
+  }
+  .shop-name-row input{
+    width:100%;
+    padding:8px 10px;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    font-family:'Archivo',sans-serif;
+    font-size:0.85rem;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .shop-name-row input:focus{outline:none;border-color:var(--yellow-dark);}
   .ticket-lines{
     max-height:calc(100vh - 420px);
     min-height:70px;
@@ -661,6 +725,18 @@
   .btn.danger{background:var(--paper);border-color:var(--red);color:var(--red);}
   .btn.danger:hover{background:var(--red);color:#fff;}
 
+  .filter-input{
+    width:100%;
+    padding:9px 12px;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    font-family:'Archivo',sans-serif;
+    font-size:0.85rem;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .filter-input:focus{outline:none;border-color:var(--yellow-dark);}
+
   /* ---------- Report modal ---------- */
   .report-summary-bar{
     display:flex;
@@ -712,6 +788,12 @@
   .re-line-meta{font-family:'JetBrains Mono',monospace;color:var(--steel);white-space:nowrap;}
   .report-empty{padding:40px 20px;text-align:center;color:var(--steel);font-size:0.88rem;}
 
+  /* ---------- Daily summary table ---------- */
+  .ds-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:0.82rem;}
+  .ds-table th{text-align:left;font-size:0.7rem;color:var(--steel);border-bottom:2px solid var(--ink);padding:7px 4px;letter-spacing:0.02em;}
+  .ds-table td{padding:7px 4px;border-bottom:1px solid var(--concrete-dark);}
+  .ds-table td.num{text-align:right;font-family:'JetBrains Mono',monospace;}
+
   ::-webkit-scrollbar{width:9px;height:9px;}
   ::-webkit-scrollbar-track{background:var(--concrete);}
   ::-webkit-scrollbar-thumb{background:var(--steel-light);border-radius:5px;}
@@ -727,6 +809,7 @@
   <div class="topbar-right">
     <span class="stock-count mono" id="stockCount">2,402 items</span>
     <button class="topbar-btn" id="reportBtn">Report</button>
+    <button class="topbar-btn" id="dailySummaryBtn">Daily Summary</button>
     <button class="topbar-btn accent" id="addProductBtn">+ Add Product</button>
   </div>
 </div>
@@ -819,8 +902,36 @@
       <h3>Order Report</h3>
       <button class="modal-close" id="reportModalClose">&times;</button>
     </div>
+    <div style="padding:12px 18px 0 18px;">
+      <input type="text" id="reportShopFilter" class="filter-input" placeholder="Filter by shop / customer name..." oninput="renderReport()">
+    </div>
     <div class="report-summary-bar" id="reportSummaryBar"></div>
     <div class="report-list" id="reportList"></div>
+  </div>
+</div>
+
+<!-- Daily Summary modal -->
+<div class="modal-overlay" id="dailySummaryModalOverlay">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <h3>Daily Summary</h3>
+      <button class="modal-close" id="dailySummaryModalClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field" style="max-width:220px;">
+        <label for="dsDate">Date</label>
+        <input type="date" id="dsDate">
+      </div>
+      <div class="report-summary-bar" id="dsSummaryBar" style="margin:0 -18px;"></div>
+      <div id="dsContent"></div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <div></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" id="dsDownloadBtn">Download PDF</button>
+          <button class="btn primary" id="dsCloseBtn">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -837,6 +948,7 @@ const PRODUCTS = [[1,"3 WAY UNIVERSAL 13A PLUG ADEPTER WITH USB AKKO",1450.0],[2
 const state = {
   order: {},           // sr -> qty
   discount: { type: 'percent', value: 0 },
+  shopName: '',          // shop/customer name for the order currently being built
   overrides: {},        // sr -> {price, buyRate, unit}
   customProducts: [],   // array of {sr, name, price, buyRate, unit}
   history: [],          // completed orders
@@ -846,12 +958,14 @@ const state = {
 function loadAll(){
   try{ const raw = localStorage.getItem('mbm_order'); if(raw) state.order = JSON.parse(raw); }catch(e){}
   try{ const raw = localStorage.getItem('mbm_discount'); if(raw) state.discount = JSON.parse(raw); }catch(e){}
+  try{ const raw = localStorage.getItem('mbm_shop_name'); if(raw !== null) state.shopName = raw; }catch(e){}
   try{ const raw = localStorage.getItem('mbm_product_overrides'); if(raw) state.overrides = JSON.parse(raw); }catch(e){}
   try{ const raw = localStorage.getItem('mbm_custom_products'); if(raw) state.customProducts = JSON.parse(raw); }catch(e){}
   try{ const raw = localStorage.getItem('mbm_order_history'); if(raw) state.history = JSON.parse(raw); }catch(e){}
 }
 function saveOrder(){ try{ localStorage.setItem('mbm_order', JSON.stringify(state.order)); }catch(e){} }
 function saveDiscount(){ try{ localStorage.setItem('mbm_discount', JSON.stringify(state.discount)); }catch(e){} }
+function saveShopName(){ try{ localStorage.setItem('mbm_shop_name', state.shopName || ''); }catch(e){} }
 function saveOverrides(){ try{ localStorage.setItem('mbm_product_overrides', JSON.stringify(state.overrides)); }catch(e){} }
 function saveCustomProducts(){ try{ localStorage.setItem('mbm_custom_products', JSON.stringify(state.customProducts)); }catch(e){} }
 function saveHistory(){ try{ localStorage.setItem('mbm_order_history', JSON.stringify(state.history)); }catch(e){} }
@@ -921,7 +1035,10 @@ function normalize(s){ return s.toUpperCase(); }
 function search(query){
   const q = query.trim();
   if(q === ''){
-    return {matches: [], showEmpty:true};
+    // No search yet — browse the full catalog in its original price-list order
+    // (the same order it appears in your source PDF), with anything you've
+    // added yourself appended at the end.
+    return {matches: CATALOG_LIST, showEmpty:false, browsingAll:true};
   }
   const qUpper = normalize(q);
   const isNumeric = /^\d+$/.test(q);
@@ -967,14 +1084,14 @@ function setQty(sr, qty){
 }
 
 function renderResults(){
-  const {matches, showEmpty} = search(searchInput.value);
+  const {matches, showEmpty, browsingAll} = search(searchInput.value);
 
   if(showEmpty){
     resultsArea.innerHTML = `
       <div class="empty-state">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <h2>Start typing to search the price list</h2>
-        <p>Search by product name, or type a Sr. No. to jump straight to it. Use "+ Add Product" above for anything not in the list.</p>
+        <h2>No products yet</h2>
+        <p>Use "+ Add Product" above to add your first item.</p>
       </div>`;
     searchHint.textContent = '';
     return;
@@ -986,11 +1103,15 @@ function renderResults(){
     return;
   }
 
-  searchHint.innerHTML = matches.length > MAX_RESULTS
-    ? `<span class="mono">${matches.length}</span> matches — showing top ${MAX_RESULTS}. Narrow your search to see more.`
-    : `<span class="mono">${matches.length}</span> match${matches.length===1?'':'es'}`;
+  // When browsing the full A–Z list (no search typed yet), show everything —
+  // otherwise cap search results for performance.
+  const shown = browsingAll ? matches : matches.slice(0, MAX_RESULTS);
 
-  const shown = matches.slice(0, MAX_RESULTS);
+  searchHint.innerHTML = browsingAll
+    ? `<span class="mono">${matches.length}</span> products, price-list order. Type to search.`
+    : (matches.length > MAX_RESULTS
+        ? `<span class="mono">${matches.length}</span> matches — showing top ${MAX_RESULTS}. Narrow your search to see more.`
+        : `<span class="mono">${matches.length}</span> match${matches.length===1?'':'es'}`);
 
   const rows = shown.map(p => {
     const { sr, name, price, unit, custom } = p;
@@ -999,8 +1120,7 @@ function renderResults(){
       ? `<div class="r-price no-price mono">Call for price</div>`
       : `<div class="r-price mono">${fmtMoney(price)}</div>`;
     const disabled = (price === null || price === undefined) ? 'disabled' : '';
-    return `
-      <div class="result-row ${qty>0?'in-order':''}" data-sr="${sr}">
+    const rowInner = `
         <div class="r-sr mono">#${fmtSr(sr)}</div>
         <div class="r-name">
           <div class="r-name-text">${escapeHtml(name)}</div>
@@ -1013,11 +1133,24 @@ function renderResults(){
           <input class="qty-input mono" type="number" min="0" value="${qty}" ${disabled}
                  onchange="setQty(${sr}, this.value)" aria-label="Quantity">
           <button class="plus" ${disabled} onclick="setQty(${sr}, qtyFor(${sr})+1)" aria-label="Increase quantity">+</button>
+        </div>`;
+
+    if(custom){
+      // Products you've added yourself can be swiped sideways to reveal a delete button.
+      return `
+      <div class="swipe-wrap">
+        <div class="swipe-delete-bg">
+          <button class="swipe-delete-btn" data-sr="${sr}">Delete</button>
         </div>
+        <div class="swipe-content result-row ${qty>0?'in-order':''}" data-sr="${sr}" data-custom="true">${rowInner}
+        </div>
+      </div>`;
+    }
+    return `<div class="result-row ${qty>0?'in-order':''}" data-sr="${sr}">${rowInner}
       </div>`;
   }).join('');
 
-  const truncatedNote = matches.length > MAX_RESULTS
+  const truncatedNote = (!browsingAll && matches.length > MAX_RESULTS)
     ? `<div class="truncated-note">${matches.length - MAX_RESULTS} more matches not shown. Refine your search to narrow the list.</div>`
     : '';
 
@@ -1030,6 +1163,77 @@ function renderResults(){
       ${truncatedNote}
     </div>`;
 }
+
+/* ---------- Swipe-to-delete (for products you've added) ---------- */
+let swipeState = null;
+
+function closeAllSwipes(exceptEl){
+  document.querySelectorAll('.swipe-content.open').forEach(el => {
+    if(el !== exceptEl) el.classList.remove('open');
+  });
+}
+
+resultsArea.addEventListener('touchstart', (e) => {
+  const el = e.target.closest('.swipe-content');
+  if(!el || el.dataset.custom !== 'true') return;
+  closeAllSwipes(el);
+  const t = e.touches[0];
+  swipeState = {
+    el,
+    startX: t.clientX,
+    startY: t.clientY,
+    baseOffset: el.classList.contains('open') ? -90 : 0,
+    currentX: 0,
+    isHorizontal: null
+  };
+  el.classList.remove('swipe-anim');
+}, {passive:true});
+
+resultsArea.addEventListener('touchmove', (e) => {
+  if(!swipeState) return;
+  const t = e.touches[0];
+  const dx = t.clientX - swipeState.startX;
+  const dy = t.clientY - swipeState.startY;
+  if(swipeState.isHorizontal === null){
+    swipeState.isHorizontal = Math.abs(dx) > Math.abs(dy) + 4;
+  }
+  if(!swipeState.isHorizontal) return;
+  e.preventDefault();
+  let offset = swipeState.baseOffset + dx;
+  offset = Math.max(-90, Math.min(0, offset));
+  swipeState.currentX = offset;
+  swipeState.el.style.transform = `translateX(${offset}px)`;
+}, {passive:false});
+
+resultsArea.addEventListener('touchend', () => {
+  if(!swipeState) return;
+  const { el, currentX, isHorizontal } = swipeState;
+  el.classList.add('swipe-anim');
+  el.style.transform = '';
+  if(isHorizontal){
+    el.classList.toggle('open', currentX < -45);
+  }
+  swipeState = null;
+});
+
+resultsArea.addEventListener('click', (e) => {
+  const delBtn = e.target.closest('.swipe-delete-btn');
+  if(delBtn){
+    deleteCustomProduct(parseInt(delBtn.dataset.sr, 10));
+    return;
+  }
+  // tapping the row content while a delete button is showing closes it
+  // instead of also triggering whatever is underneath
+  const openEl = document.querySelector('.swipe-content.open');
+  if(openEl && !e.target.closest('.swipe-delete-bg')){
+    e.preventDefault();
+    closeAllSwipes(null);
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.swipe-wrap')) closeAllSwipes(null);
+});
 
 /* ============================= ORDER / DISCOUNT / TICKET ============================= */
 
@@ -1095,6 +1299,10 @@ function ticketHtml(){
       <h2>ORDER TICKET</h2>
       <span class="count mono">${itemCount} item${itemCount===1?'':'s'}</span>
     </div>
+    <div class="shop-name-row">
+      <label for="shopNameInput">Shop / Customer Name</label>
+      <input type="text" id="shopNameInput" value="${escapeHtml(state.shopName || '')}" oninput="setShopName(this.value)" placeholder="e.g. Silva Hardware, Kandy">
+    </div>
     <div class="ticket-lines">${linesHtml}</div>
     <div class="ticket-summary">
       <div class="sum-row"><span>Subtotal</span><span class="mono">${fmtMoney(subtotal)}</span></div>
@@ -1141,6 +1349,13 @@ function setDiscountType(t){
   updateMobileBar();
 }
 
+function setShopName(v){
+  // Deliberately does NOT re-render the ticket, so the input never loses
+  // focus/cursor position while typing.
+  state.shopName = v;
+  saveShopName();
+}
+
 function updateMobileBar(){
   const {total, itemCount} = computeTotals();
   const bar = document.getElementById('mobileBar');
@@ -1154,8 +1369,10 @@ function clearOrder(){
   showConfirm('Clear all items from the current order? This will NOT be saved to the report.', () => {
     state.order = {};
     state.discount = { type: 'percent', value: 0 };
+    state.shopName = '';
     saveOrder();
     saveDiscount();
+    saveShopName();
     renderResults();
     renderTicket();
     updateMobileBar();
@@ -1169,9 +1386,15 @@ function completeOrder(){
     flashMessage('Add items to the order first');
     return;
   }
+  const shopName = (state.shopName || '').trim();
+  if(!shopName){
+    flashMessage('Enter a shop / customer name before completing the order');
+    return;
+  }
   const record = {
     id: Date.now(),
     timestamp: new Date().toISOString(),
+    shopName,
     lines: lines.map(l => ({
       sr: l.sr,
       name: l.product.name,
@@ -1188,12 +1411,14 @@ function completeOrder(){
 
   state.order = {};
   state.discount = { type: 'percent', value: 0 };
+  state.shopName = '';
   saveOrder();
   saveDiscount();
+  saveShopName();
   renderResults();
   renderTicket();
   updateMobileBar();
-  flashMessage('Order completed and saved to Report');
+  flashMessage('Order for ' + shopName + ' completed and saved to Report');
   closeSheet();
 }
 
@@ -1211,11 +1436,12 @@ function buildOrderText(){
   const out = [
     'MBM (PVT) LTD — Order Ticket',
     new Date().toLocaleString(),
+    state.shopName && state.shopName.trim() ? 'Shop: ' + state.shopName.trim() : null,
     '--------------------------------------',
     ...rows,
     '--------------------------------------',
     `Subtotal: Rs ${subtotal.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2})}`
-  ];
+  ].filter(Boolean);
   if(discountAmount > 0){
     out.push(`Discount: - Rs ${discountAmount.toLocaleString('en-LK', {minimumFractionDigits:2, maximumFractionDigits:2})}`);
   }
@@ -1310,6 +1536,14 @@ function downloadInvoice(){
   doc.setTextColor(90);
   doc.text('Order Invoice', 14, 25);
   doc.text(new Date().toLocaleString(), 14, 30);
+  let headerY = 30;
+  const shopNameTrimmed = (state.shopName || '').trim();
+  if(shopNameTrimmed){
+    headerY += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0);
+    doc.text('Shop: ' + shopNameTrimmed, 14, headerY);
+  }
   doc.setTextColor(0);
 
   const body = lines.map(l => {
@@ -1320,7 +1554,7 @@ function downloadInvoice(){
   });
 
   doc.autoTable({
-    startY: 36,
+    startY: headerY + 6,
     head: [['Sr#', 'Product', 'Qty', 'Unit', 'Unit Price', 'Total']],
     body: body,
     styles: { fontSize: 9, cellPadding: 3 },
@@ -1513,6 +1747,7 @@ function closeReport(){
 function renderReport(){
   const bar = document.getElementById('reportSummaryBar');
   const list = document.getElementById('reportList');
+  const filterVal = (document.getElementById('reportShopFilter').value || '').trim().toLowerCase();
 
   if(state.history.length === 0){
     bar.innerHTML = '';
@@ -1520,14 +1755,27 @@ function renderReport(){
     return;
   }
 
-  const totalRevenue = state.history.reduce((s,r) => s + r.total, 0);
+  const filtered = filterVal
+    ? state.history.filter(r => (r.shopName || '').toLowerCase().includes(filterVal))
+    : state.history;
+
+  if(filtered.length === 0){
+    bar.innerHTML = `<div>0 of <b>${state.history.length}</b> orders match that shop name</div>`;
+    list.innerHTML = `<div class="report-empty">No orders found for that shop / customer name.</div>`;
+    return;
+  }
+
+  const totalRevenue = filtered.reduce((s,r) => s + r.total, 0);
   bar.innerHTML = `
-    <div><b>${state.history.length}</b> saved order${state.history.length===1?'':'s'}</div>
+    <div><b>${filtered.length}</b>${filtered.length!==state.history.length ? ' of '+state.history.length : ''} saved order${filtered.length===1?'':'s'}</div>
     <div>Total: <b>${fmtMoney(totalRevenue)}</b></div>
-    <div style="margin-left:auto;"><button class="btn danger" style="padding:5px 10px;font-size:0.72rem;" onclick="clearHistory()">Clear all report history</button></div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn" style="padding:5px 10px;font-size:0.72rem;" onclick="downloadReportPdf()">Download Report</button>
+      <button class="btn danger" style="padding:5px 10px;font-size:0.72rem;" onclick="clearHistory()">Clear all report history</button>
+    </div>
   `;
 
-  list.innerHTML = state.history.map(r => {
+  list.innerHTML = filtered.map(r => {
     const dateStr = new Date(r.timestamp).toLocaleString();
     const linesHtml = r.lines.map(l => `
       <div class="re-line">
@@ -1541,8 +1789,8 @@ function renderReport(){
       <div class="report-entry" id="report-entry-${r.id}">
         <div class="report-entry-head" onclick="toggleReportEntry(${r.id})">
           <div>
-            <div class="re-date">${dateStr}</div>
-            <div class="re-meta">${r.itemCount} item${r.itemCount===1?'':'s'}${r.unpriced>0 ? ' · '+r.unpriced+' unpriced' : ''}</div>
+            <div class="re-date">${escapeHtml(r.shopName || 'Unnamed order')}</div>
+            <div class="re-meta">${dateStr} · ${r.itemCount} item${r.itemCount===1?'':'s'}${r.unpriced>0 ? ' · '+r.unpriced+' unpriced' : ''}</div>
           </div>
           <div class="re-total mono">${fmtMoney(r.total)}</div>
         </div>
@@ -1567,6 +1815,216 @@ function clearHistory(){
     renderReport();
     flashMessage('Report history cleared');
   });
+}
+
+function downloadReportPdf(){
+  if(state.history.length === 0){
+    flashMessage('No saved orders to download yet');
+    return;
+  }
+  if(!window.jspdf || !window.jspdf.jsPDF){
+    flashMessage('PDF library did not load — check your internet connection');
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('MBM (PVT) LTD', 14, 18);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(90);
+  doc.text('Order Report — all saved orders', 14, 25);
+  doc.text('Generated ' + new Date().toLocaleString(), 14, 30);
+  doc.setTextColor(0);
+
+  // oldest to newest, one row per line item, with an order-total row after each order
+  const chronological = state.history.slice().reverse();
+  const body = [];
+  chronological.forEach(r => {
+    const dateStr = new Date(r.timestamp).toLocaleString();
+    const shop = r.shopName || '—';
+    r.lines.forEach(l => {
+      body.push([
+        dateStr,
+        shop,
+        fmtSr(l.sr),
+        l.name,
+        String(l.qty),
+        l.unit,
+        l.price===null ? '—' : fmtMoney(l.price),
+        l.lineTotal===null ? '—' : fmtMoney(l.lineTotal)
+      ]);
+    });
+    if(r.discountAmount > 0){
+      body.push([dateStr, shop, '', 'Discount', '', '', '', '- ' + fmtMoney(r.discountAmount)]);
+    }
+    body.push([dateStr, shop, '', 'ORDER TOTAL', '', '', '', fmtMoney(r.total)]);
+  });
+
+  doc.autoTable({
+    startY: 36,
+    head: [['Date/Time', 'Shop', 'Sr#', 'Product', 'Qty', 'Unit', 'Unit Price', 'Total']],
+    body: body,
+    styles: { fontSize: 7.5, cellPadding: 2.5 },
+    headStyles: { fillColor: [28, 31, 34], textColor: [242, 183, 5] },
+    columnStyles: {
+      0: { cellWidth: 26 },
+      1: { cellWidth: 26 },
+      2: { cellWidth: 12 },
+      4: { cellWidth: 10, halign: 'center' },
+      5: { cellWidth: 12, halign: 'center' },
+      6: { cellWidth: 20, halign: 'right' },
+      7: { cellWidth: 20, halign: 'right' }
+    },
+    margin: { left: 8, right: 8 },
+    didParseCell: function(data){
+      if(data.row.raw[3] === 'ORDER TOTAL' || data.row.raw[3] === 'Discount'){
+        data.cell.styles.fontStyle = 'bold';
+      }
+    }
+  });
+
+  const grandTotal = state.history.reduce((s,r) => s + r.total, 0);
+  const finalY = doc.lastAutoTable.finalY + 10;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.text('GRAND TOTAL — ' + state.history.length + ' order(s): ' + fmtMoney(grandTotal), 200, finalY, { align: 'right' });
+
+  const filename = 'MBM-Order-Report-' + new Date().toISOString().slice(0,10) + '.pdf';
+  doc.save(filename);
+  flashMessage('Report downloaded');
+}
+
+/* ============================= DAILY SUMMARY ============================= */
+
+function todayDateKey(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function localDateKey(iso){
+  const d = new Date(iso);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function computeDailySummary(dateKey){
+  const orders = state.history.filter(r => localDateKey(r.timestamp) === dateKey);
+  const productMap = {};
+  let revenue = 0;
+  orders.forEach(r => {
+    revenue += r.total;
+    r.lines.forEach(l => {
+      if(!productMap[l.sr]){
+        productMap[l.sr] = { sr: l.sr, name: l.name, unit: l.unit, qty: 0, revenue: 0 };
+      }
+      productMap[l.sr].qty += l.qty;
+      if(l.lineTotal !== null) productMap[l.sr].revenue += l.lineTotal;
+    });
+  });
+  const products = Object.values(productMap).sort((a,b) => b.qty - a.qty);
+  return { orders, products, revenue };
+}
+
+function openDailySummary(){
+  const dateInput = document.getElementById('dsDate');
+  if(!dateInput.value){ dateInput.value = todayDateKey(); }
+  renderDailySummary();
+  document.getElementById('dailySummaryModalOverlay').classList.add('open');
+}
+function closeDailySummary(){
+  document.getElementById('dailySummaryModalOverlay').classList.remove('open');
+}
+
+function renderDailySummary(){
+  const dateKey = document.getElementById('dsDate').value || todayDateKey();
+  const { orders, products, revenue } = computeDailySummary(dateKey);
+
+  const bar = document.getElementById('dsSummaryBar');
+  bar.innerHTML = `
+    <div><b>${orders.length}</b> order${orders.length===1?'':'s'}</div>
+    <div>Revenue: <b>${fmtMoney(revenue)}</b></div>
+    <div>Products sold: <b>${products.length}</b></div>
+  `;
+
+  const content = document.getElementById('dsContent');
+  if(orders.length === 0){
+    content.innerHTML = `<div class="report-empty">No completed orders on this date.</div>`;
+    return;
+  }
+
+  const orderRows = orders.map(o => `
+    <tr>
+      <td>${escapeHtml(o.shopName || 'Unnamed order')}</td>
+      <td class="num">${new Date(o.timestamp).toLocaleTimeString()}</td>
+      <td class="num">${o.itemCount}</td>
+      <td class="num">${fmtMoney(o.total)}</td>
+    </tr>`).join('');
+
+  const rows = products.map(p => `
+    <tr>
+      <td>${escapeHtml(p.name)}</td>
+      <td class="num">${p.qty}</td>
+      <td class="num">${escapeHtml(p.unit)}</td>
+      <td class="num">${fmtMoney(p.revenue)}</td>
+    </tr>`).join('');
+
+  content.innerHTML = `
+    <h4 style="margin:14px 0 4px 0;font-size:0.8rem;color:var(--steel);">Orders on this date</h4>
+    <table class="ds-table">
+      <thead><tr><th>Shop / Customer</th><th style="text-align:right;">Time</th><th style="text-align:right;">Items</th><th style="text-align:right;">Total</th></tr></thead>
+      <tbody>${orderRows}</tbody>
+    </table>
+    <h4 style="margin:18px 0 4px 0;font-size:0.8rem;color:var(--steel);">Total quantity sold, by product</h4>
+    <table class="ds-table">
+      <thead><tr><th>Product</th><th style="text-align:right;">Qty Sold</th><th style="text-align:right;">Unit</th><th style="text-align:right;">Revenue</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function downloadDailySummaryPdf(){
+  const dateKey = document.getElementById('dsDate').value || todayDateKey();
+  const { orders, products, revenue } = computeDailySummary(dateKey);
+  if(orders.length === 0){
+    flashMessage('No orders on this date to download');
+    return;
+  }
+  if(!window.jspdf || !window.jspdf.jsPDF){
+    flashMessage('PDF library did not load — check your internet connection');
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('MBM (PVT) LTD', 14, 18);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(90);
+  doc.text('Daily Summary — ' + dateKey, 14, 25);
+  doc.text(orders.length + ' order(s) · Revenue ' + fmtMoney(revenue), 14, 30);
+  doc.setTextColor(0);
+
+  const body = products.map(p => [p.name, String(p.qty), p.unit, fmtMoney(p.revenue)]);
+
+  doc.autoTable({
+    startY: 36,
+    head: [['Product', 'Qty Sold', 'Unit', 'Revenue']],
+    body: body,
+    styles: { fontSize: 9, cellPadding: 3 },
+    headStyles: { fillColor: [28, 31, 34], textColor: [242, 183, 5] },
+    columnStyles: {
+      1: { halign: 'right' },
+      2: { halign: 'center' },
+      3: { halign: 'right' }
+    },
+    margin: { left: 14, right: 14 }
+  });
+
+  const filename = 'MBM-Daily-Summary-' + dateKey + '.pdf';
+  doc.save(filename);
+  flashMessage('Daily summary downloaded');
 }
 
 /* ============================= CONFIRM DIALOG ============================= */
@@ -1646,6 +2104,15 @@ document.getElementById('reportBtn').addEventListener('click', openReport);
 document.getElementById('reportModalClose').addEventListener('click', closeReport);
 document.getElementById('reportModalOverlay').addEventListener('click', (e) => {
   if(e.target.id === 'reportModalOverlay') closeReport();
+});
+
+document.getElementById('dailySummaryBtn').addEventListener('click', openDailySummary);
+document.getElementById('dailySummaryModalClose').addEventListener('click', closeDailySummary);
+document.getElementById('dsCloseBtn').addEventListener('click', closeDailySummary);
+document.getElementById('dsDownloadBtn').addEventListener('click', downloadDailySummaryPdf);
+document.getElementById('dsDate').addEventListener('change', renderDailySummary);
+document.getElementById('dailySummaryModalOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'dailySummaryModalOverlay') closeDailySummary();
 });
 
 /* ============================= INIT ============================= */
